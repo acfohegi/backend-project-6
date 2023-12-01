@@ -1,6 +1,4 @@
-setup: prepare install db-migrate
-
-start: start-frontend start-backend
+setup: prepare install db-migrate build
 
 install:
 	npm install
