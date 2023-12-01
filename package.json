@@ -7,7 +7,7 @@
    "scripts": {
       "prebuild": "rm -rf dist",
       "test": "jest --verbose --runInBand",
-      "build": "webpack",
+      "build": "npx webpack",
       "start": "fastify start server/plugin.js -l debug -P -o"
    },
    "jest": {
