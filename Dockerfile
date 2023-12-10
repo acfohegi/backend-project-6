@@ -1,21 +1,8 @@
-FROM node:18-slim
-
-RUN apt-get update && apt-get install -yq \
-  build-essential \
-  python3
-
-RUN ln -s /usr/bin/python3 /usr/bin/python
-
+FROM node:20-alpine
+LABEL test-tm latest
+RUN apk update && apk upgrade && apk add build-base python3
+COPY . ./app
 WORKDIR /app
-
-COPY package.json .
-COPY package-lock.json .
-
 RUN npm ci
+CMD make build
 
-COPY . .
-
-ENV NODE_ENV=production
-RUN make build
-
-CMD ["bash", "-c", "make db-migrate && npm start"]
