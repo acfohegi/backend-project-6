@@ -1,4 +1,4 @@
-setup: prepare install db-migrate build
+setup: prepare install db-migrate docker-build
 
 install:
 	npm install
