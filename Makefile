@@ -6,6 +6,9 @@ install:
 db-migrate:
 	npx knex migrate:latest
 
+docker-build:
+	docker-compose up webpack-builder
+
 build:
 	npm run build
 
