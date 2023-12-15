@@ -1,7 +1,12 @@
 version: '3'
 services:
   webpack-builder:
-    build: .
+    build: 
+      context: .
+      dockerfile: build/Dockerfile
     volumes:
       - ./dist:/app/dist
-
+  app:
+    build: .
+    ports: 
+      - 3000:3000

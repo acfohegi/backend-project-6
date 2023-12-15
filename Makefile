@@ -1,4 +1,6 @@
-setup: prepare install db-migrate docker-build
+setup: prepare install db-migrate 
+
+start: start-frontend start-backend
 
 install:
 	npm install
@@ -8,6 +10,9 @@ db-migrate:
 
 docker-build:
 	docker-compose up webpack-builder
+
+docker-build-run:
+	docker-compose up app
 
 build:
 	npm run build
