@@ -3,7 +3,7 @@ setup: prepare install db-migrate
 start: start-frontend start-backend
 
 install:
-	npm install
+	npm install && npm install -D webpack-cli
 
 db-migrate:
 	npx knex migrate:latest
