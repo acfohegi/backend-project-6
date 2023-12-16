@@ -1,9 +1,7 @@
 setup: prepare install db-migrate 
 
-start: start-frontend start-backend
-
 install:
-	npm install && npm install -D webpack-cli
+	npm install
 
 db-migrate:
 	npx knex migrate:latest
@@ -20,11 +18,8 @@ build:
 prepare:
 	cp -n .env.example .env || true
 
-start-backend:
+start:
 	npm start -- --watch --verbose-watch --ignore-watch='node_modules .git .sqlite'
-
-start-frontend:
-	npx webpack --watch --progress &
 
 lint:
 	npx eslint .
