@@ -1,7 +1,10 @@
 setup: prepare install db-migrate 
 
+prepare:
+	cp -n .env.example .env || true
+
 install:
-	npm install
+	npm ci
 
 db-migrate:
 	npx knex migrate:latest
@@ -15,8 +18,8 @@ docker-build-run:
 build:
 	npm run build
 
-prepare:
-	cp -n .env.example .env || true
+build-setup:
+	export NODE_ENV=development && npm ci && make build && rm -rf node_modules && export NODE_ENV=production && make setup
 
 start:
 	npm start -- --watch --verbose-watch --ignore-watch='node_modules .git .sqlite'
@@ -26,3 +29,5 @@ lint:
 
 test:
 	npm test -s
+
+.PHONY: build
