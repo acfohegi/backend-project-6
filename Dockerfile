@@ -13,6 +13,5 @@ ENV NODE_ENV=production
 COPY --from=build /app /app
 RUN make setup
 LABEL org.opencontainers.image.source https://github.com/acfohegi/task-manager
-EXPOSE 10000
 CMD make start
 
