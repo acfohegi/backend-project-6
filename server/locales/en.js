@@ -2,7 +2,7 @@
 
 export default {
   translation: {
-    appName: 'Fastify Boilerplate',
+    appName: 'Fastify Project',
     flash: {
       session: {
         create: {
@@ -47,8 +47,8 @@ export default {
       },
       welcome: {
         index: {
-          hello: 'Hello from Hexlet!',
-          description: 'Online programming school',
+          hello: 'Hello from me!',
+          description: 'Description',
           more: 'Learn more',
         },
       },
