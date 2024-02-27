@@ -51,6 +51,22 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
+  it('create with no name', async () => {
+    const fullData = testData.users.new;
+    const params = { email: fullData.email, password: fullData.password };
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('users'),
+      payload: {
+        data: params,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const user = await models.user.query().findOne({ email: params.email });
+    expect(user).toBeUndefined();
+  });
+
   it('create', async () => {
     const params = testData.users.new;
     const response = await app.inject({

@@ -2,7 +2,11 @@
 
 export default {
   translation: {
-    appName: 'Fastify Project',
+    appName: 'Менеджер задач',
+    buttons: {
+      edit: 'Изменить',
+      delete: 'Удалить',
+    },
     flash: {
       session: {
         create: {
@@ -17,6 +21,14 @@ export default {
         create: {
           error: 'Не удалось зарегистрировать',
           success: 'Пользователь успешно зарегистрирован',
+        },
+        delete: {
+          error: 'Не удалось удалить пользователя',
+          success: 'Пользователь успешно удалён',
+        },
+        edit: {
+          error: 'Не удалось изменить пользователя',
+          success: 'Пользователь успешно изменён',
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -38,8 +50,16 @@ export default {
       },
       users: {
         id: 'ID',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
+        fullName: 'Полное имя',
         email: 'Email',
+        password: 'Пароль',
         createdAt: 'Дата создания',
+        actions: 'Действия',
+        edit: {
+          title: 'Редактирование пользователя',
+        },
         new: {
           submit: 'Сохранить',
           signUp: 'Регистрация',

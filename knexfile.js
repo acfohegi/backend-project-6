@@ -14,18 +14,17 @@ export const production = {
   connection: {
     filename: path.resolve(__dirname, 'database.sqlite'),
   },
-  // debug: true,
   useNullAsDefault: true,
   migrations,
 };
 
 export const development = {
   ...production,
+  debug: true
 };
 
-// export const test = {
-//   ...production,
-//   connection: ':memory:',
-//   // debug: true,
-// };
+export const test = {
+  ...development,
+  connection: ':memory:',
+};
 
