@@ -10,9 +10,9 @@ const migrations = {
 };
 
 export const production = {
-  client: 'sqlite3',
+  client: 'pg',
   connection: {
-    filename: path.resolve(__dirname, 'database.sqlite'),
+    connectionString: process.env.DB_CONNECTION_STRING,
   },
   useNullAsDefault: true,
   migrations,
@@ -20,6 +20,10 @@ export const production = {
 
 export const development = {
   ...production,
+  client: 'sqlite3',
+  connection: {
+    filename: path.resolve(__dirname, 'database.sqlite'),
+  },
   debug: true
 };
 
