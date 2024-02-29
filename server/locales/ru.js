@@ -6,6 +6,7 @@ export default {
     buttons: {
       edit: 'Изменить',
       delete: 'Удалить',
+      createStatus: 'Создать статус',
     },
     flash: {
       session: {
@@ -15,6 +16,20 @@ export default {
         },
         delete: {
           success: 'Вы разлогинены',
+        },
+      },
+      statuses: {
+        create: {
+          error: 'Не удалось создать статус',
+          success: 'Статус успешно создан',
+        },
+        delete: {
+          error: 'Не удалось удалить статус',
+          success: 'Статус успешно удалён',
+        },
+        edit: {
+          error: 'Не удалось изменить статус',
+          success: 'Статус успешно изменён',
         },
       },
       users: {
@@ -36,6 +51,7 @@ export default {
     layouts: {
       application: {
         users: 'Пользователи',
+        statuses: 'Статусы',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -46,6 +62,20 @@ export default {
         new: {
           signIn: 'Вход',
           submit: 'Войти',
+        },
+      },
+      statuses: {
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        edit: {
+          title: 'Изменение статуса',
+          submit: 'Изменить статус',
+        },
+        new: {
+          title: 'Создание статуса',
+          submit: 'Создать статус',
         },
       },
       users: {

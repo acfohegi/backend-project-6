@@ -6,6 +6,7 @@ export default {
     buttons: {
       edit: 'Edit',
       delete: 'Delete',
+      createStatus: 'Create status',
     },
     flash: {
       session: {
@@ -17,18 +18,32 @@ export default {
           success: 'You are logged out',
         },
       },
+      statuses: {
+        create: {
+          error: 'Failed to create a status',
+          success: 'Status has been created successfully',
+        },
+        delete: {
+          error: 'Failed to delete a status',
+          success: 'Status has been deleted successfully',
+        },
+        edit: {
+          error: 'Failed to edit a status',
+          success: 'Status has been edited successfully',
+        },
+      },
       users: {
         create: {
           error: 'Failed to register',
-          success: 'User registered successfully',
+          success: 'User has been registered successfully',
         },
         delete: {
           error: 'Failed to delete',
-          success: 'User deleted succesfully',
+          success: 'User has been deleted successfully',
         },
         edit: {
           error: 'Failed to edit',
-          success: 'User edited succesfully',
+          success: 'User has been edited successfully',
         },
       },
       authError: 'Access denied! Please login',
@@ -36,6 +51,7 @@ export default {
     layouts: {
       application: {
         users: 'Users',
+        statuses: 'Statuses',
         signIn: 'Login',
         signUp: 'Register',
         signOut: 'Logout',
@@ -46,6 +62,20 @@ export default {
         new: {
           signIn: 'Login',
           submit: 'Login',
+        },
+      },
+      statuses: {
+        id: 'ID',
+        name: 'Name',
+        createdAt: 'Created at',
+        actions: 'Actions',
+        edit: {
+          title: 'Status editing',
+          submit: 'Edit status',
+        },
+        new: {
+          title: 'Status creation',
+          submit: 'Create status',
         },
       },
       users: {

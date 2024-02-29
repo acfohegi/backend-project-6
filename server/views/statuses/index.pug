@@ -1,0 +1,22 @@
+extends ../layouts/application.pug
+
+block content
+  a.btn.btn-primary(href=`statuses/new`)= t('buttons.createStatus')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.statuses.id')
+        th= t('views.statuses.name')
+        th= t('views.statuses.createdAt')
+        th= t('views.statuses.actions')
+    tbody
+      each status in statuses
+        tr
+          td= status.id
+          td= status.name
+          td= formatDate(status.createdAt)
+          td
+            div.d-flex
+              a.btn.btn-primary(href=`statuses/${status.id}/edit`)= t('buttons.edit')
+              +buttonTo(`/statuses/${status.id}`, 'delete')(class="btn btn-danger ms-2" value=t('buttons.delete'))
+

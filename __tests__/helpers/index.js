@@ -18,3 +18,11 @@ export const prepareData = async (app) => {
   // получаем данные из фикстур и заполняем БД
   await knex('users').insert(getFixtureData('users.json'));
 };
+
+export const authenticateRequests = async (app) => {
+  await app.addHook('preHandler', async (req, reply) => {
+    const user = await app.objection.models.user.query().first();
+    await req.logIn(user);
+  });
+};
+
