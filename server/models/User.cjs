@@ -25,6 +25,10 @@ module.exports = class User extends unique(BaseModel) {
     };
   }
 
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   set password(value) {
     this.passwordDigest = encrypt(value);
   }
@@ -32,4 +36,12 @@ module.exports = class User extends unique(BaseModel) {
   verifyPassword(password) {
     return encrypt(password) === this.passwordDigest;
   }
+
+  async getTasks() {
+    const Task = require('./Task.cjs');
+    const tasksExecuting = await Task.query().where('executorId', this.id);
+    const tasksCreated = await Task.query().where('creatorId', this.id);
+    return [...tasksExecuting, ...tasksCreated];
+  }
 }
+

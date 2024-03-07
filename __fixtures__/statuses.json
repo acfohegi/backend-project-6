@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "status for one task"
+  },
+  {
+    "id": 2,
+    "name": "status for several tasks"
+  },
+  {
+    "id": 3,
+    "name": "status with no tasks"
+  }
+]

@@ -1,0 +1,36 @@
+extends ../layouts/application.pug
+
+block header
+  h1= t('layouts.application.tasks')
+
+block content
+  a.btn.btn-primary(href=`tasks/new`)= t('buttons.createTask')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.tasks.id')
+        th= t('views.tasks.name')
+        th= t('views.tasks.statusId')
+        th= t('views.tasks.creatorId')
+        th= t('views.tasks.executorId')
+        th= t('views.tasks.createdAt')
+        th= t('views.tasks.actions')
+    tbody
+      each task in tasks
+        - status = statuses.find((s) => s.id == task.statusId)
+        - creator = users.find((u) => u.id == task.creatorId)
+        - executor = users.find((u) => u.id == task.executorId)
+        tr
+          td
+            a(href=`tasks/${task.id}`)= task.id
+          td
+            a(href=`tasks/${task.id}`)= task.name
+          td= status.name
+          td= creator.fullName
+          td= executor && executor.fullName || ''
+          td= formatDate(task.createdAt)
+          td
+            div.d-flex
+              a.btn.btn-primary(href=`tasks/${task.id}/edit`)= t('buttons.edit')
+              +buttonTo(`/tasks/${task.id}`, 'delete')(class="btn btn-danger ms-2" value=t('buttons.delete'))
+

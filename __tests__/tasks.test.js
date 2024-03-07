@@ -1,14 +1,14 @@
 // @ts-check
 
+import _ from 'lodash';
 import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
-import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
 
 
-describe('test statuses CRUD', () => {
+describe('test tasks CRUD', () => {
   let app;
   let knex;
   let models;
@@ -38,7 +38,16 @@ describe('test statuses CRUD', () => {
   it('index', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('statuses'),
+      url: app.reverse('tasks'),
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('show', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/tasks/1',
     });
 
     expect(response.statusCode).toBe(200);
@@ -47,33 +56,33 @@ describe('test statuses CRUD', () => {
   it('new', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newStatus'),
+      url: app.reverse('newTask'),
     });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('create with no name', async () => {
-    const params = { name: '' };
+    const params = _.omit(testData.tasks.new, 'name');
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('statuses'),
+      url: app.reverse('tasks'),
       payload: {
         data: params,
       },
     });
 
-    const statusesCount = await models.status.query().count();
+    const tasksCount = await models.task.query().count();
     expect(response.statusCode).toBe(200);
-    const result = await models.status.query().count();
-    expect(statusesCount).toStrictEqual(result);
+    const result = await models.task.query().count();
+    expect(tasksCount).toStrictEqual(result);
   });
 
   it('create', async () => {
-    const params = { name: faker.lorem.word() };
+    const params = testData.tasks.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('statuses'),
+      url: app.reverse('tasks'),
       payload: {
         data: params,
       },
@@ -81,8 +90,33 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
     const expected = params;
-    const status = await models.status.query().findOne(params);
-    expect(status).toMatchObject(expected);
+    const task = await models.task.query().orderBy('id', 'desc').limit(1)
+    expect(task).toMatchObject(expected);
+  });
+
+  it('edit', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/tasks/1',
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('update', async () => {
+    const task = await models.task.query().findOne(testData.tasks.existing);
+    const params = { ...task, description: faker.lorem.word() };
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/tasks/1',
+      payload: {
+        data: params,
+      },
+    });
+
+    const updatedTask = await models.task.query().findById(task.id);
+    expect(response.statusCode).toBe(302);
+    expect(updatedTask).toMatchObject(params);
   });
 
   afterEach(async () => {

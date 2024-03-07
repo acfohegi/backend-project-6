@@ -7,6 +7,7 @@ export default {
       edit: 'Изменить',
       delete: 'Удалить',
       createStatus: 'Создать статус',
+      createTask: 'Создать задачу',
     },
     flash: {
       session: {
@@ -25,11 +26,26 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить статус',
+          hasTasks: 'Со статусом связаны задачи',
           success: 'Статус успешно удалён',
         },
         edit: {
           error: 'Не удалось изменить статус',
           success: 'Статус успешно изменён',
+        },
+      },
+      tasks: {
+        create: {
+          error: 'Не удалось создать задачу',
+          success: 'Задача успешно создана',
+        },
+        delete: {
+          error: 'Не удалось удалить задачу',
+          success: 'Задача успешно удалёна',
+        },
+        edit: {
+          error: 'Не удалось изменить задачу',
+          success: 'Задача успешно изменёна',
         },
       },
       users: {
@@ -39,6 +55,7 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить пользователя',
+          hasTasks: 'С пользователем связаны задачи',
           success: 'Пользователь успешно удалён',
         },
         edit: {
@@ -55,6 +72,7 @@ export default {
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
+        tasks: 'Задачи',
       },
     },
     views: {
@@ -76,6 +94,24 @@ export default {
         new: {
           title: 'Создание статуса',
           submit: 'Создать статус',
+        },
+      },
+      tasks: {
+        id: 'ID',
+        name: 'Наименование',
+        description: 'Описание',
+        statusId: 'Статус',
+        executorId: 'Исполнитель',
+        creatorId: 'Автор',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        edit: {
+          title: 'Изменение задачи',
+          submit: 'Изменить задачу',
+        },
+        new: {
+          title: 'Создание задачи',
+          submit: 'Создать задачу',
         },
       },
       users: {

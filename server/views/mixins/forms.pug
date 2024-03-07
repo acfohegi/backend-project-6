@@ -1,25 +1,60 @@
-- const getInputName = (property) => `data[${property}]`
-- const getInputId = (property) => `data_${property}`
+- const getFieldName = (property) => `data[${property}]`
+- const getFieldId = (property) => `data_${property}`
 
 mixin formFor(entity = null)
   form&attributes(attributes)
     block
 
-mixin input(entity, entityName, propertyName, errors = {})
+mixin formField(tag, entity, entityName, propertyName, errors = {})
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
-  - inputId = getInputId(propertyName)
+  - fieldName = getFieldName(propertyName)
+  - fieldId = getFieldId(propertyName)
+  - labelValue = t(`views.${entityName}.${propertyName}`)
+  - fieldValue = _.get(entity, propertyName, '')
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
+    label(
+      for=inputId
+    )= labelValue
+    if tag === 'textarea'
+      textarea(
+        id=fieldId
+        name=fieldName
+        class=classLine
+      )&attributes(attributes) #{fieldValue}
+    if tag === 'input'
+      input(
+        id=fieldId
+        name=fieldName
+        class=classLine
+        value=fieldValue
+      )&attributes(attributes)
+    if !_.isEmpty(propertyErrors)
+      .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
+
+mixin input(entity, entityName, propertyName, errors = {})
+  +formField('input', entity, entityName, propertyName, errors)
+
+mixin textarea(entity, entityName, propertyName, errors = {})
+  +formField('textarea', entity, entityName, propertyName, errors)
+
+mixin select(entity, entityName, propertyName, options, optionNameValue, errors = {})
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-control' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
+  - fieldId = getFieldId(propertyName)
   - labelValue = t(`views.${entityName}.${propertyName}`)
   .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
-      for= inputId
+      for=inputId
     )= labelValue
-    input(
-      id= inputId
-      name=getInputName(propertyName)
-      class=classLine
-      value=_.get(entity, propertyName, '')
+    select(
+        id=inputId
+        name=getFieldName(propertyName)
+        class=classLine
     )&attributes(attributes)
+      option(selected=entity[propertyName] === undefined)
+      each opt in options
+        option(value=opt.id selected=opt.id === entity[propertyName]) #{opt[optionNameValue]}
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 

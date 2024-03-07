@@ -10,5 +10,20 @@
       "email": "lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
     }
+  },
+  "tasks": {
+    "new": {
+      "name": "Task1",
+      "description": "Description",
+      "statusId": 2,
+      "creatorId": 1,
+      "executorId": 1
+    },
+    "existing": {
+      "name": "Task without description",
+      "statusId": 2,
+      "creatorId": 2,
+      "executorId": 1
+    }
   }
 }

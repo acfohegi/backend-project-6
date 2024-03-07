@@ -68,7 +68,7 @@ export default (app) => {
     .patch('/statuses/:id', async (req, reply) => {
       let status;
       try {
-        isPermitted(req)
+        isPermitted(req);
         status = await getCurrentStatus(req);
         await status.$query().patch(req.body.data);
         req.flash('info', i18next.t('flash.statuses.edit.success'));
@@ -81,14 +81,20 @@ export default (app) => {
     })
     .delete('/statuses/:id', async (req, reply) => {
       try {
-        isPermitted(req)
+        isPermitted(req);
+        const status = await getCurrentStatus(req);
+        const tasks = await status.getTasks();
+        if (tasks.length > 0) {
+          throw Error(i18next.t('flash.tasks.delete.hasTasks'));
+        }
         const statusId = req.params.id;
         await app.objection.models.status.query().deleteById(statusId);
         req.flash('info', i18next.t('flash.status.delete.success'));
       } catch (e) {
-        req.flash('error', i18next.t('flash.status.delete.error'));
+        req.flash('error', i18next.t('flash.status.delete.error'), e.message);
       }
       reply.redirect(app.reverse('status'));
       return reply;
     });
 };
+

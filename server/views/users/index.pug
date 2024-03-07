@@ -1,5 +1,8 @@
 extends ../layouts/application.pug
 
+block header
+  h1= t('layouts.application.users')
+
 block content
   table.table.table-striped
     thead
@@ -13,7 +16,7 @@ block content
       each user in users
         tr
           td= user.id
-          td= `${user.firstName} ${user.lastName}`
+          td= user.fullName
           td= user.email
           td= formatDate(user.createdAt)
           td

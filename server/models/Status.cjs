@@ -20,5 +20,10 @@ module.exports = class Status extends unique(BaseModel) {
       },
     };
   }
+
+  async getTasks() {
+    const Task = require('./Task.cjs');
+    return await Task.query().where('statusId', this.id);
+  }
 }
 

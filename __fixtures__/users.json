@@ -1,17 +1,20 @@
 [
   {
+    "id": 1,
     "firstName": "Elbert",
     "lastName": "Abshire",
     "email": "elbert_abshire52@gmail.com",
     "passwordDigest": "5f9b60f2fdeefeb82add76f9acfe629e2844987d245c9f07005dda1e1316c3f6"
   },
   {
+    "id": 2,
     "firstName": "Lawrence",
     "lastName": "Kulas",
     "email": "lawrence.kulas87@outlook.com",
     "passwordDigest": "87c6374c24969f2af49433baa6d8b96e2bdb17a509b79049d2edb4fde98e4c46"
   },
   {
+    "id": 3,
     "firstName": "nona",
     "lastName": "murray b",
     "email": "nona_murray_b@yahoo.com",

@@ -1,5 +1,8 @@
 extends ../layouts/application.pug
 
+block header
+  h1= t('layouts.application.statuses')
+
 block content
   a.btn.btn-primary(href=`statuses/new`)= t('buttons.createStatus')
   table.table.table-striped

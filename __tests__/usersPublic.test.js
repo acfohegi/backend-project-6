@@ -2,13 +2,12 @@
 
 import _ from 'lodash';
 import fastify from 'fastify';
-import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
-import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
+import { getTestData, prepareData } from './helpers/index.js';
 
-describe('test users CRUD for authenticated', () => {
+describe('test users CRUD for unauthenticated', () => {
   let app;
   let knex;
   let models;
@@ -29,44 +28,62 @@ describe('test users CRUD for authenticated', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
-    await authenticateRequests(app, testData.users.existing.email);
   });
 
   beforeEach(async () => {
   });
 
-  it('edit', async () => {
-    const user = await models.user.query().findOne({ email: testData.users.existing.email });
+  it('index', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: `users/${user.id}/edit`,
+      url: app.reverse('users'),
     });
+
     expect(response.statusCode).toBe(200);
   });
 
-  it('update', async () => {
-    const user = await models.user.query().findOne({ email: testData.users.existing.email });
-    const params = {
-      firstName: faker.person.firstName(),
-      lastName: user.lastName,
-      email: faker.internet.email(),
-      password: faker.lorem.word(),
-    };
+  it('new', async () => {
     const response = await app.inject({
-      method: 'PATCH',
-      url: `users/${user.id}`,
+      method: 'GET',
+      url: app.reverse('newUser'),
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('create with no name', async () => {
+    const fullData = testData.users.new;
+    const params = { email: fullData.email, password: fullData.password };
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('users'),
       payload: {
         data: params,
       },
     });
 
-    const updatedUser = await models.user.query().findOne({ email: params.email });
+    expect(response.statusCode).toBe(200);
+    const user = await models.user.query().findOne({ email: params.email });
+    expect(user).toBeUndefined();
+  });
+
+  it('create', async () => {
+    const params = testData.users.new;
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('users'),
+      payload: {
+        data: params,
+      },
+    });
+
     expect(response.statusCode).toBe(302);
     const expected = {
       ..._.omit(params, 'password'),
       passwordDigest: encrypt(params.password),
     };
-    expect(updatedUser).toMatchObject(expected);
+    const user = await models.user.query().findOne({ email: params.email });
+    expect(user).toMatchObject(expected);
   });
 
   afterEach(async () => {

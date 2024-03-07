@@ -7,6 +7,7 @@ export default {
       edit: 'Edit',
       delete: 'Delete',
       createStatus: 'Create status',
+      createTask: 'Create task',
     },
     flash: {
       session: {
@@ -25,11 +26,26 @@ export default {
         },
         delete: {
           error: 'Failed to delete a status',
+          hasTasks: 'Status has associated tasks',
           success: 'Status has been deleted successfully',
         },
         edit: {
           error: 'Failed to edit a status',
           success: 'Status has been edited successfully',
+        },
+      },
+      tasks: {
+        create: {
+          error: 'Failed to create a task',
+          success: 'Task has been created successfully',
+        },
+        delete: {
+          error: 'Failed to delete a task',
+          success: 'Task has been deleted successfully',
+        },
+        edit: {
+          error: 'Failed to edit a task',
+          success: 'Task has been edited successfully',
         },
       },
       users: {
@@ -39,6 +55,7 @@ export default {
         },
         delete: {
           error: 'Failed to delete',
+          hasTasks: 'User has associated tasks',
           success: 'User has been deleted successfully',
         },
         edit: {
@@ -55,6 +72,7 @@ export default {
         signIn: 'Login',
         signUp: 'Register',
         signOut: 'Logout',
+        tasks: 'Tasks',
       },
     },
     views: {
@@ -76,6 +94,24 @@ export default {
         new: {
           title: 'Status creation',
           submit: 'Create status',
+        },
+      },
+      tasks: {
+        id: 'ID',
+        name: 'Name',
+        description: 'Description',
+        statusId: 'Status',
+        executorId: 'Executor',
+        creatorId: 'Creator',
+        createdAt: 'Created at',
+        actions: 'Actions',
+        edit: {
+          title: 'Task editing',
+          submit: 'Edit task',
+        },
+        new: {
+          title: 'Task creation',
+          submit: 'Create task',
         },
       },
       users: {

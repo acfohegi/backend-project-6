@@ -17,11 +17,18 @@ export const prepareData = async (app) => {
 
   // получаем данные из фикстур и заполняем БД
   await knex('users').insert(getFixtureData('users.json'));
+  await knex('statuses').insert(getFixtureData('statuses.json'));
+  await knex('tasks').insert(getFixtureData('tasks.json'));
 };
 
-export const authenticateRequests = async (app) => {
+export const authenticateRequests = async (app, email) => {
   await app.addHook('preHandler', async (req, reply) => {
-    const user = await app.objection.models.user.query().first();
+    let user;
+    if (email) {
+      user = await app.objection.models.user.query().findOne({ email });
+    } else {
+      user = await app.objection.models.user.query().first();
+    }
     await req.logIn(user);
   });
 };
