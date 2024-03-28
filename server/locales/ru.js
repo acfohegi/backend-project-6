@@ -6,10 +6,26 @@ export default {
     buttons: {
       edit: 'Изменить',
       delete: 'Удалить',
-      createStatus: 'Создать статус',
-      createTask: 'Создать задачу',
+      createStatus: 'Новый статус',
+      createTask: 'Новая задача',
+      createLabel: 'Новая метка',
     },
     flash: {
+      labels: {
+        create: {
+          error: 'Не удалось создать метку',
+          success: 'Метка успешно создана',
+        },
+        delete: {
+          error: 'Не удалось удалить метку',
+          hasTasks: 'С меткой связаны задачи',
+          success: 'Метка успешно удалёна',
+        },
+        edit: {
+          error: 'Не удалось изменить метку',
+          success: 'Метка успешно изменёна',
+        },
+      },
       session: {
         create: {
           success: 'Вы залогинены',
@@ -73,9 +89,24 @@ export default {
         signUp: 'Регистрация',
         signOut: 'Выход',
         tasks: 'Задачи',
+        labels: 'Метки',
       },
     },
     views: {
+      labels: {
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        edit: {
+          title: 'Изменение метки',
+          submit: 'Изменить метку',
+        },
+        new: {
+          title: 'Создание метки',
+          submit: 'Создать метку',
+        },
+      },
       session: {
         new: {
           signIn: 'Вход',
@@ -100,6 +131,7 @@ export default {
         id: 'ID',
         name: 'Наименование',
         description: 'Описание',
+        labels: 'Метки',
         statusId: 'Статус',
         executorId: 'Исполнитель',
         creatorId: 'Автор',

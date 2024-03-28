@@ -1,20 +1,23 @@
 [
   {
+    "id": 1,
     "name": "Task1",
-    "description": "Creator and executor are the same user",
+    "description": "Creator and executor are the same user. Has one label.",
     "statusId": 1,
     "creatorId": 1,
     "executorId": 1
   },
   {
+    "id": 2,
     "name": "Task2",
-    "description": "Different creator and executor. No task for user 3.",
+    "description": "Different creator and executor. No task for user 3. The task has two labels.",
     "statusId": 2,
     "creatorId": 1,
     "executorId": 2
   },
   {
-    "name": "Task without description",
+    "id": 3,
+    "name": "Task without description and label",
     "statusId": 2,
     "creatorId": 2,
     "executorId": 1

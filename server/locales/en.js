@@ -6,10 +6,26 @@ export default {
     buttons: {
       edit: 'Edit',
       delete: 'Delete',
-      createStatus: 'Create status',
-      createTask: 'Create task',
+      createStatus: 'New status',
+      createTask: 'New task',
+      createLabel: 'New label',
     },
     flash: {
+      labels: {
+        create: {
+          error: 'Failed to create a label',
+          success: 'Label has been created successfully',
+        },
+        delete: {
+          error: 'Failed to delete a label',
+          hasTasks: 'Label has associated tasks',
+          success: 'Label has been deleted successfully',
+        },
+        edit: {
+          error: 'Failed to edit a Label',
+          success: 'Label has been edited successfully',
+        },
+      },
       session: {
         create: {
           success: 'You are logged in',
@@ -73,9 +89,24 @@ export default {
         signUp: 'Register',
         signOut: 'Logout',
         tasks: 'Tasks',
+        labels: 'Labels',
       },
     },
     views: {
+      labels: {
+        id: 'ID',
+        name: 'Name',
+        createdAt: 'Created at',
+        actions: 'Actions',
+        edit: {
+          title: 'Label editing',
+          submit: 'Edit label',
+        },
+        new: {
+          title: 'Label creation',
+          submit: 'Create label',
+        },
+      },
       session: {
         new: {
           signIn: 'Login',
@@ -100,6 +131,7 @@ export default {
         id: 'ID',
         name: 'Name',
         description: 'Description',
+        labels: 'Labels',
         statusId: 'Status',
         executorId: 'Executor',
         creatorId: 'Creator',

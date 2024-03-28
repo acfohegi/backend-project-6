@@ -14,13 +14,17 @@
   "tasks": {
     "new": {
       "name": "Task1",
-      "description": "Description",
+      "description": "Description and labels",
       "statusId": 2,
       "creatorId": 1,
-      "executorId": 1
+      "executorId": 1,
+      "labels": [
+        1,
+        2
+      ]
     },
     "existing": {
-      "name": "Task without description",
+      "name": "Task without description and label",
       "statusId": 2,
       "creatorId": 2,
       "executorId": 1

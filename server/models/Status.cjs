@@ -21,9 +21,18 @@ module.exports = class Status extends unique(BaseModel) {
     };
   }
 
-  async getTasks() {
+  async getTasks(db) {
     const Task = require('./Task.cjs');
-    return await Task.query().where('statusId', this.id);
+    return await Task.query(db).where('statusId', this.id);
+  }
+
+  static async create(statusData, db) {
+    const validStatus = await this.fromJson(statusData);
+    await this.query(db).insert(validStatus);
+  }
+
+  async update(statusData, db) {
+    await this.$query(db).patch(statusData);
   }
 }
 

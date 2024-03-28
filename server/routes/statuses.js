@@ -8,16 +8,14 @@ const isPermitted = (req) => {
   }
 }
 
-const getCurrentStatus = async (req) => {
-  return await req.server.objection.models.status.query().findById(req.params.id);
-}
-
 export default (app) => {
+  const Status = app.objection.models.status;
+
   app
     .get('/statuses', { name: 'statuses' }, async (req, reply) => {
       try {
         isPermitted(req);
-        const statuses = await app.objection.models.status.query();
+        const statuses = await Status.index();
         reply.render('statuses/index', { statuses });
       } catch (e) {
         req.flash('error', e.message);
@@ -28,27 +26,12 @@ export default (app) => {
     .get('/statuses/new', { name: 'newStatus' }, (req, reply) => {
       try {
         isPermitted(req);
-        const status = new app.objection.models.status();
+        const status = new Status();
         reply.render('statuses/new', { status });
       } catch (e) {
         req.flash('error', e.message);
         reply.redirect(app.reverse('root'));
       }
-    })
-    .post('/statuses', async (req, reply) => {
-      const status = new app.objection.models.status();
-      status.$set(req.body.data);
-      try {
-        isPermitted(req);
-        const validStatus = await app.objection.models.status.fromJson(req.body.data);
-        await app.objection.models.status.query().insert(validStatus);
-        req.flash('info', i18next.t('flash.statuses.create.success'));
-        reply.redirect(app.reverse('root'));
-      } catch ({ data }) {
-        req.flash('error', i18next.t('flash.statuses.create.error'));
-        reply.render('statuses/new', { status, errors: data });
-      }
-      return reply;
     })
     .get(
       '/statuses/:id/edit',
@@ -56,7 +39,7 @@ export default (app) => {
       async (req, reply) => {
         try {
           isPermitted(req);
-          const status = await getCurrentStatus(req);
+          const status = await Status.find(req.params.id);
           reply.render('statuses/edit', { status });
         } catch (e) {
           req.flash('error', e.message);
@@ -65,12 +48,26 @@ export default (app) => {
         return reply;
       }
     )
+    .post('/statuses', async (req, reply) => {
+      const status = new Status();
+      status.$set(req.body.data);
+      try {
+        isPermitted(req);
+        await Status.create(req.body.data);
+        req.flash('info', i18next.t('flash.statuses.create.success'));
+        reply.redirect(app.reverse('root'));
+      } catch ({ data }) {
+        req.flash('error', i18next.t('flash.statuses.create.error'));
+        reply.render('statuses/new', { status, errors: data });
+      }
+      return reply;
+    })
     .patch('/statuses/:id', async (req, reply) => {
       let status;
       try {
         isPermitted(req);
-        status = await getCurrentStatus(req);
-        await status.$query().patch(req.body.data);
+        const status = await Status.find(req.params.id);
+        await status.update(req.body.data);
         req.flash('info', i18next.t('flash.statuses.edit.success'));
         reply.redirect(app.reverse('statuses'));
       } catch (e) {
@@ -82,18 +79,17 @@ export default (app) => {
     .delete('/statuses/:id', async (req, reply) => {
       try {
         isPermitted(req);
-        const status = await getCurrentStatus(req);
+        const status = await Status.find(req.params.id);
         const tasks = await status.getTasks();
         if (tasks.length > 0) {
-          throw Error(i18next.t('flash.tasks.delete.hasTasks'));
+          throw Error(i18next.t('flash.statuses.delete.hasTasks'));
         }
-        const statusId = req.params.id;
-        await app.objection.models.status.query().deleteById(statusId);
-        req.flash('info', i18next.t('flash.status.delete.success'));
+        await Status.delete(req.params.id);
+        req.flash('info', i18next.t('flash.statuses.delete.success'));
       } catch (e) {
-        req.flash('error', i18next.t('flash.status.delete.error'), e.message);
+        req.flash('error', i18next.t('flash.statuses.delete.error'), e.message);
       }
-      reply.redirect(app.reverse('status'));
+      reply.redirect(app.reverse('statuses'));
       return reply;
     });
 };

@@ -37,11 +37,20 @@ module.exports = class User extends unique(BaseModel) {
     return encrypt(password) === this.passwordDigest;
   }
 
-  async getTasks() {
+  async getTasks(db) {
     const Task = require('./Task.cjs');
-    const tasksExecuting = await Task.query().where('executorId', this.id);
-    const tasksCreated = await Task.query().where('creatorId', this.id);
-    return [...tasksExecuting, ...tasksCreated];
+    const tasksExecuting = await Task.query(db).where('executorId', this.id);
+    const tasksCreated = await Task.query(db).where('creatorId', this.id);
+    return [...tasksExecuting, ...tasksCreated]; // TODO: unique?
+  }
+
+  static async create(userData, db) {
+    const validUser = await this.fromJson(userData);
+    await this.query(db).insert(validUser);
+  }
+
+  async update(userData, db) {
+    await this.$query().patch(userData);
   }
 }
 

@@ -14,7 +14,7 @@ mixin formField(tag, entity, entityName, propertyName, errors = {})
   - fieldValue = _.get(entity, propertyName, '')
   .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
-      for=inputId
+      for=fieldId
     )= labelValue
     if tag === 'textarea'
       textarea(
@@ -45,16 +45,36 @@ mixin select(entity, entityName, propertyName, options, optionNameValue, errors 
   - labelValue = t(`views.${entityName}.${propertyName}`)
   .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
-      for=inputId
+      for=fieldId
     )= labelValue
     select(
-        id=inputId
+        id=fieldId
         name=getFieldName(propertyName)
         class=classLine
     )&attributes(attributes)
       option(selected=entity[propertyName] === undefined)
       each opt in options
         option(value=opt.id selected=opt.id === entity[propertyName]) #{opt[optionNameValue]}
+    if !_.isEmpty(propertyErrors)
+      .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
+
+mixin labelsSelect(selectedLabels, entityName, propertyName, options, optionNameValue, errors = {})
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-control' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
+  - fieldId = getFieldId(propertyName)
+  - labelValue = t(`views.${entityName}.${propertyName}`)
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
+    label(
+      for=fieldId
+    )= labelValue
+    select(
+        id=fieldId
+        name=getFieldName(propertyName)
+        class=classLine
+        multiple="multiple"
+    )&attributes(attributes)
+      each opt in options
+        option(value=opt.id selected=selectedLabels.includes(opt.id)) #{opt[optionNameValue]}
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 

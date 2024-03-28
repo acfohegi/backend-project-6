@@ -21,15 +21,14 @@ import ru from './locales/ru.js';
 import en from './locales/en.js';
 // @ts-ignore
 import addRoutes from './routes/index.js';
+import addHelperRoutes from './routes/helpers.js';
 import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
-
 const mode = process.env.NODE_ENV || 'development';
-// const isDevelopment = mode === 'development';
 
 const setUpViews = (app) => {
   const helpers = getHelpers(app);
@@ -129,5 +128,10 @@ export default async (app, _options) => {
   addRoutes(app);
   addHooks(app);
 
+  if (mode !== 'production') {
+    addHelperRoutes(app);
+  }
+
   return app;
 };
+

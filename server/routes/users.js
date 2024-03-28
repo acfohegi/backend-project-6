@@ -8,18 +8,13 @@ const isPermitted = (req) => {
   }
 }
 
-const getCurrentUser = async (app, req) => {
-  return await app.objection.models.user.query().findById(req.params.id);
-}
-
 export default (app) => {
   const User = app.objection.models.user;
   const Task = app.objection.models.task;
 
   app
     .get('/users', { name: 'users' }, async (req, reply) => {
-      const users = await app.objection.models.user.query();
-
+      const users = await User.index();
       reply.render('users/index', { users });
       return reply;
     })
@@ -27,27 +22,13 @@ export default (app) => {
       const user = new User();
       reply.render('users/new', { user });
     })
-    .post('/users', async (req, reply) => {
-      const user = new User();
-      user.$set(req.body.data);
-      try {
-        const validUser = await User.fromJson(req.body.data);
-        await User.query().insert(validUser);
-        req.flash('info', i18next.t('flash.users.create.success'));
-        reply.redirect(app.reverse('root'));
-      } catch ({ data }) {
-        req.flash('error', i18next.t('flash.users.create.error'));
-        reply.render('users/new', { user, errors: data });
-      }
-      return reply;
-    })
     .get(
       '/users/:id/edit',
       // { name: 'editUser', preHandler: app.fp.authenticate },
       async (req, reply) => {
         try {
           isPermitted(req);
-          const user = await getCurrentUser(app, req);
+          const user = await User.find(req.params.id);
           reply.render('users/edit', { user });
         } catch (e) {
           req.flash('error', e.message);
@@ -56,12 +37,25 @@ export default (app) => {
         return reply;
       }
     )
+    .post('/users', async (req, reply) => {
+      const user = new User();
+      user.$set(req.body.data);
+      try {
+        await User.create(req.body.data);
+        req.flash('info', i18next.t('flash.users.create.success'));
+        reply.redirect(app.reverse('root'));
+      } catch ({ data }) {
+        req.flash('error', i18next.t('flash.users.create.error'));
+        reply.render('users/new', { user, errors: data });
+      }
+      return reply;
+    })
     .patch('/users/:id', async (req, reply) => {
       let user;
       try {
         isPermitted(req);
-        user = await getCurrentUser(app, req);
-        await user.$query().patch(req.body.data);
+        user = await User.find(req.params.id);
+        await user.update(req.body.data);
         req.flash('info', i18next.t('flash.users.edit.success'));
         reply.redirect(app.reverse('users'));
       } catch (e) {
@@ -78,7 +72,7 @@ export default (app) => {
         if (tasks.length > 0) {
           throw Error(i18next.t('flash.users.delete.hasTasks'));
         }
-        await User.query().deleteById(req.params.id);
+        await User.delete(req.params.id);
         req.logOut();
         req.flash('info', i18next.t('flash.users.delete.success'));
       } catch (e) {
@@ -86,6 +80,6 @@ export default (app) => {
       }
       reply.redirect(app.reverse('users'));
       return reply;
-    });
+    })
 };
 

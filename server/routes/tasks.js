@@ -14,22 +14,29 @@ const isTaskOwner = (req) => {
   }
 };
 
-const getCurrentTask = async (req) => {
-  return await req.server.objection.models.task.query().findById(req.params.id);
+const parseLabels = (labels) => {
+  if (Array.isArray(labels)) {
+    return labels.map((l) => parseInt(l));
+  }
+  if (typeof labels === 'string') {
+    return [parseInt(labels)];
+  }
+  return [];
 };
 
 export default (app) => {
   const Task = app.objection.models.task;
   const User = app.objection.models.user;
   const Status = app.objection.models.status;
+  const Label = app.objection.models.label;
 
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
       try {
         isPermitted(req);
-        const tasks = await Task.query();
-        const statuses = await Status.query();
-        const users = await User.query();
+        const tasks = await Task.index();
+        const statuses = await Status.index();
+        const users = await User.index();
         reply.render('tasks/index', { tasks, statuses, users });
       } catch (e) {
         req.flash('error', e.message);
@@ -41,9 +48,11 @@ export default (app) => {
       try {
         isPermitted(req);
         const task = new Task();
-        const statuses = await Status.query();
-        const users = await User.query();
-        reply.render('tasks/new', { task, statuses, users });
+        const statuses = await Status.index();
+        const users = await User.index();
+        const labels = await Label.index();
+        const selectedLabels = [];
+        reply.render('tasks/new', { task, statuses, users, labels, selectedLabels });
       } catch (e) {
         req.flash('error', e.message);
         reply.redirect(app.reverse('root'));
@@ -53,39 +62,15 @@ export default (app) => {
     .get('/tasks/:id', async (req, reply) => {
       try {
         isPermitted(req);
-        const task = await getCurrentTask(req);
+        const task = await Task.find(req.params.id);
+        const labels = await task.getLabels();
         const status = await task.getStatus();
         const creator = await task.getCreator();
         const executor = await task.getExecutor();
-        reply.render('tasks/show', { task, status, creator, executor });
+        reply.render('tasks/show', { task, labels, status, creator, executor });
       } catch (e) {
         req.flash('error', e.message);
         reply.redirect(app.reverse('root'));
-      }
-      return reply;
-    })
-    .post('/tasks', async (req, reply) => {
-      const task = new Task();
-      const { name, description, statusId, executorId } = req.body.data;
-      const data = {
-        name,
-        description,
-        statusId: parseInt(statusId),
-        executorId: executorId === '' ? null : parseInt(executorId),
-        creatorId: req.user.id,
-      };
-      task.$set(data);
-      try {
-        isPermitted(req);
-        const validTask = await Task.fromJson(data);
-        await Task.query().insert(validTask);
-        req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect(app.reverse('root'));
-      } catch (e) {
-        const statuses = await Status.query();
-        const users = await User.query();
-        req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.render('tasks/new', { task, statuses, users, errors: e.data });
       }
       return reply;
     })
@@ -93,12 +78,14 @@ export default (app) => {
       '/tasks/:id/edit',
       // { name: 'editUser', preHandler: app.fp.authenticate },
       async (req, reply) => {
-        const statuses = await Status.query();
-        const users = await User.query();
+        const statuses = await Status.index();
+        const users = await User.index();
+        const labels = await Label.index();
         try {
           isPermitted(req);
-          const task = await getCurrentTask(req);
-          reply.render('tasks/edit', { task, statuses, users});
+          const task = await Task.find(req.params.id);
+          const selectedLabels = await task.getLabelIds();
+          reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels });
         } catch (e) {
           req.flash('error', e.message);
           reply.redirect(app.reverse('tasks'));
@@ -106,29 +93,57 @@ export default (app) => {
         return reply;
       }
     )
-    .patch('/tasks/:id', async (req, reply) => {
-      app.log.error(req.body.data);
-      const { name, description, statusId, executorId } = req.body.data;
-      const data = {
+    .post('/tasks', async (req, reply) => {
+      const { name, description, statusId, executorId, labels } = req.body.data;
+      const taskData = {
         name,
         description,
         statusId: parseInt(statusId),
         executorId: executorId === '' ? null : parseInt(executorId),
         creatorId: req.user.id,
       };
-      app.log.error(data);
-      let task;
+      const task = new Task();
+      const selectedLabels = parseLabels(labels);
+      task.$set(taskData);
+      task.$setRelated('labels', selectedLabels);
       try {
         isPermitted(req);
-        task = await getCurrentTask(req);
-        await task.$query().patch(data);
+        await Task.create(taskData, selectedLabels);
+        req.flash('info', i18next.t('flash.tasks.create.success'));
+        reply.redirect(app.reverse('tasks'));
+      } catch (e) {
+        const statuses = await Status.index();
+        const users = await User.index();
+        const labels = await Label.index();
+        req.flash('error', i18next.t('flash.tasks.create.error'));
+        reply.render('tasks/new', { task, statuses, users, labels, selectedLabels, errors: e.data });
+      }
+      return reply;
+    })
+    .patch('/tasks/:id', async (req, reply) => {
+      const { name, description, statusId, executorId, labels } = req.body.data;
+      const taskData = {
+        name,
+        description,
+        statusId: parseInt(statusId),
+        executorId: executorId === '' ? null : parseInt(executorId),
+      };
+      let task;
+      const selectedLabels = parseLabels(labels);
+      try {
+        isPermitted(req);
+        task = await Task.find(req.params.id);
+        task.$set(taskData);
+        task.$setRelated('labels', selectedLabels);
+        await task.update(taskData, selectedLabels);
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
-        const statuses = await Status.query();
-        const users = await User.query();
+        const statuses = await Status.index();
+        const users = await User.index();
+        const labels = await Label.index();
         req.flash('error', i18next.t('flash.tasks.edit.error'));
-        reply.render('tasks/edit', { task, statuses, users, errors: e.data });
+        reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels, errors: e.data });
       }
       return reply;
     })
@@ -136,7 +151,7 @@ export default (app) => {
       try {
         isPermitted(req);
         isTaskOwner(req);
-        await Task.query().deleteById(req.params.id);
+        await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
       } catch (e) {
         req.flash('error', i18next.t('flash.tasks.delete.error'));

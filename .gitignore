@@ -6,3 +6,5 @@ tmp/
 temp/
 database.sqlite
 .env
+notes.js
+

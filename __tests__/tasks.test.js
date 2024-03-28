@@ -22,17 +22,12 @@ describe('test tasks CRUD', () => {
     await init(app);
     knex = app.objection.knex;
     models = app.objection.models;
-
-    // TODO: пока один раз перед тестами
-    // тесты не должны зависеть друг от друга
-    // перед каждым тестом выполняем миграции
-    // и заполняем БД тестовыми данными
-    await knex.migrate.latest();
-    await prepareData(app);
     await authenticateRequests(app);
   });
 
   beforeEach(async () => {
+    await knex.migrate.latest();
+    await prepareData(app);
   });
 
   it('index', async () => {
@@ -89,8 +84,8 @@ describe('test tasks CRUD', () => {
     });
 
     expect(response.statusCode).toBe(302);
-    const expected = params;
-    const task = await models.task.query().orderBy('id', 'desc').limit(1)
+    const expected = _.omit(params, 'labels');
+    const task = await models.task.query().orderBy('id', 'desc').limit(1).first();
     expect(task).toMatchObject(expected);
   });
 
@@ -108,21 +103,36 @@ describe('test tasks CRUD', () => {
     const params = { ...task, description: faker.lorem.word() };
     const response = await app.inject({
       method: 'PATCH',
-      url: '/tasks/1',
+      url: `/tasks/${task.id}`,
       payload: {
         data: params,
       },
     });
 
-    const updatedTask = await models.task.query().findById(task.id);
+    const updatedTask = await task.$query();
     expect(response.statusCode).toBe(302);
     expect(updatedTask).toMatchObject(params);
   });
 
+  it('update does not change creator', async () => {
+    const task = await models.task.query().findOne(testData.tasks.existing);
+    const params = { ...task, description: faker.lorem.word() };
+    const response = await app.inject({
+      method: 'PATCH',
+      url: `/tasks/${task.id}`,
+      payload: {
+        data: params,
+      },
+    });
+
+    const updatedTask = await task.$query();
+    const whoamiResponse = await app.inject({ method: 'GET', url: '/whoami' });    const userId = parseInt(whoamiResponse.body);
+    expect(userId).not.toBe(task.creatorId);
+    expect(response.statusCode).toBe(302);
+    expect(updatedTask.creatorId).toBe(task.creatorId);
+  });
   afterEach(async () => {
-    // Пока Segmentation fault: 11
-    // после каждого теста откатываем миграции
-    // await knex.migrate.rollback();
+    await knex.migrate.rollback();
   });
 
   afterAll(async () => {
