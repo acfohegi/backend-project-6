@@ -132,9 +132,11 @@ export default {
         name: 'Наименование',
         description: 'Описание',
         labels: 'Метки',
+        label: 'Метка',
         statusId: 'Статус',
         executorId: 'Исполнитель',
         creatorId: 'Автор',
+        myTasks: 'Только мои задачи',
         createdAt: 'Дата создания',
         actions: 'Действия',
         edit: {
@@ -173,3 +175,4 @@ export default {
     },
   },
 };
+

@@ -48,9 +48,9 @@ mixin select(entity, entityName, propertyName, options, optionNameValue, errors 
       for=fieldId
     )= labelValue
     select(
-        id=fieldId
-        name=getFieldName(propertyName)
-        class=classLine
+      id=fieldId
+      name=getFieldName(propertyName)
+      class=classLine
     )&attributes(attributes)
       option(selected=entity[propertyName] === undefined)
       each opt in options
@@ -68,15 +68,37 @@ mixin labelsSelect(selectedLabels, entityName, propertyName, options, optionName
       for=fieldId
     )= labelValue
     select(
-        id=fieldId
-        name=getFieldName(propertyName)
-        class=classLine
-        multiple="multiple"
+      id=fieldId
+      name=getFieldName(propertyName)
+      class=classLine
+      multiple="multiple"
     )&attributes(attributes)
       each opt in options
         option(value=opt.id selected=selectedLabels.includes(opt.id)) #{opt[optionNameValue]}
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
+
+mixin filterSelect(filters, entityName, propertyName, propertyLocale, options, optionNameValue, errors = {})
+  - selectedOptions = filters[propertyName]
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-select' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
+  - fieldId = getFieldId(propertyName)
+  - labelValue= t(`views.${entityName}.${propertyLocale}`)
+  .col-12.col-md
+    .input-group.mb-3
+      label.input-group-text(
+        for=fieldId
+      )= labelValue
+      select(
+        id=fieldId
+        name=propertyName
+        class=classLine
+      )&attributes(attributes)
+        option(selected=selectedOptions.length === 0)
+        each opt in options
+          option(value=opt.id selected=selectedOptions.includes(opt.id.toString())) #{opt[optionNameValue]}
+      if !_.isEmpty(propertyErrors)
+        .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin submit(form = null)
   input(class='btn btn-primary' type='submit')&attributes(attributes)

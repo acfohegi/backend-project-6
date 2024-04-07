@@ -5,7 +5,7 @@ import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
-import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
+import { getTestData, getFixtureData, prepareData, authenticateRequests } from './helpers/index.js';
 
 
 describe('test tasks CRUD', () => {
@@ -13,6 +13,14 @@ describe('test tasks CRUD', () => {
   let knex;
   let models;
   const testData = getTestData();
+  const taskFilters = getFixtureData('task_filters.json');
+  const indexQueries = [
+    '',
+    '?status=2&label=2',
+    '?status=2&executor=3&executor=2&label=3&isCreatorUser=on&creator=2',
+    '?status=404&executor=404&executor=404&label=404&isCreatorUser=none&creator=404',
+  ];
+
 
   beforeAll(async () => {
     app = fastify({
@@ -30,14 +38,23 @@ describe('test tasks CRUD', () => {
     await prepareData(app);
   });
 
-  it('index', async () => {
+  it.each(indexQueries)('index%s', async (i) => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('tasks'),
+      url: [
+        app.reverse('tasks'),
+        i,
+      ].join(''),
     });
 
     expect(response.statusCode).toBe(200);
   });
+
+  it.each(taskFilters)('filters %s', async (_name, { filters, result }) => {
+    const tasks = await models.task.index(filters);
+    const actual = tasks.map((t) => t.id)
+    expect(actual).toStrictEqual(result);
+  })
 
   it('show', async () => {
     const response = await app.inject({
@@ -131,6 +148,7 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
     expect(updatedTask.creatorId).toBe(task.creatorId);
   });
+
   afterEach(async () => {
     await knex.migrate.rollback();
   });

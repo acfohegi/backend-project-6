@@ -142,5 +142,22 @@ module.exports = class Task extends BaseModel {
       throw e;
     }
   }
+
+  static async index(filters, db) {
+    let query = this.query(db).withGraphJoined('labels');
+    if (filters.status?.length > 0) {
+      query.whereIn('statusId', filters.status);
+    }
+    if (filters.executor?.length > 0) {
+      query.whereIn('executorId', filters.executor);
+    }
+    if (filters.label?.length > 0) {
+      query.whereIn('labels.id', filters.label);
+    }
+    if (filters.creator?.length > 0) {
+      query.whereIn('creatorId', filters.creator);
+    }
+    return await query;
+  }
 }
 

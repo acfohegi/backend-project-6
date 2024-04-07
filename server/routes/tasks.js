@@ -24,6 +24,24 @@ const parseLabels = (labels) => {
   return [];
 };
 
+const parseFilters = (req) => {
+  const parse = (data) => {
+    if (!data) {
+      return [];
+    }
+    return Array.isArray(data) ? data : [data];
+  };
+  const { status, executor, label, creator, isCreatorUser } = req.query;
+  return {
+    status: parse(status),
+    executor: parse(executor),
+    label: parse(label),
+    // query parameter 'isCreatorUser' is made in consent with requirements
+    // it will override direct creator query
+    creator: isCreatorUser === 'on' ? [req.user.id] : parse(creator),
+  };
+};
+
 export default (app) => {
   const Task = app.objection.models.task;
   const User = app.objection.models.user;
@@ -34,11 +52,15 @@ export default (app) => {
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
       try {
         isPermitted(req);
-        const tasks = await Task.index();
+        const filters = parseFilters(req);
+        const tasks = await Task.index(filters);
         const statuses = await Status.index();
         const users = await User.index();
-        reply.render('tasks/index', { tasks, statuses, users });
+        const labels = await Label.index();
+        app.log.debug(filters);
+        reply.render('tasks/index', { filters, tasks, statuses, users, labels });
       } catch (e) {
+        app.log.error(e);
         req.flash('error', e.message);
         reply.redirect(app.reverse('root'));
       }

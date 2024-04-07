@@ -131,10 +131,12 @@ export default {
         id: 'ID',
         name: 'Name',
         description: 'Description',
+        label: 'Label',
         labels: 'Labels',
         statusId: 'Status',
         executorId: 'Executor',
         creatorId: 'Creator',
+        myTasks: 'My tasks only',
         createdAt: 'Created at',
         actions: 'Actions',
         edit: {
@@ -159,13 +161,13 @@ export default {
           title: 'User editing',
         },
         new: {
-          submit: 'Register',
+          submit: 'Save',
           signUp: 'Register',
         },
       },
       welcome: {
         index: {
-          hello: 'Hello from me!',
+          hello: 'Hello!',
           description: 'Description',
           more: 'Learn more',
         },
@@ -173,3 +175,4 @@ export default {
     },
   },
 };
+
