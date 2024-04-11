@@ -18,7 +18,6 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить метку',
-          hasTasks: 'С меткой связаны задачи',
           success: 'Метка успешно удалёна',
         },
         edit: {
@@ -42,7 +41,6 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить статус',
-          hasTasks: 'Со статусом связаны задачи',
           success: 'Статус успешно удалён',
         },
         edit: {
@@ -57,6 +55,7 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить задачу',
+          notCreatorError: 'Вы должны быть создателем задачи',
           success: 'Задача успешно удалёна',
         },
         edit: {
@@ -71,7 +70,6 @@ export default {
         },
         delete: {
           error: 'Не удалось удалить пользователя',
-          hasTasks: 'С пользователем связаны задачи',
           success: 'Пользователь успешно удалён',
         },
         edit: {
@@ -80,6 +78,7 @@ export default {
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
+      hasTasksError: 'Имеет связанные задачи',
     },
     layouts: {
       application: {

@@ -18,7 +18,6 @@ export default {
         },
         delete: {
           error: 'Failed to delete a label',
-          hasTasks: 'Label has associated tasks',
           success: 'Label has been deleted successfully',
         },
         edit: {
@@ -42,7 +41,6 @@ export default {
         },
         delete: {
           error: 'Failed to delete a status',
-          hasTasks: 'Status has associated tasks',
           success: 'Status has been deleted successfully',
         },
         edit: {
@@ -57,6 +55,7 @@ export default {
         },
         delete: {
           error: 'Failed to delete a task',
+          notCreatorError: 'You have to be the creator of the task',
           success: 'Task has been deleted successfully',
         },
         edit: {
@@ -71,7 +70,6 @@ export default {
         },
         delete: {
           error: 'Failed to delete',
-          hasTasks: 'User has associated tasks',
           success: 'User has been deleted successfully',
         },
         edit: {
@@ -79,7 +77,8 @@ export default {
           success: 'User has been edited successfully',
         },
       },
-      authError: 'Access denied! Please login',
+      authError: 'Access denied! Please login.',
+      hasTasksError: 'Has associated tasks',
     },
     layouts: {
       application: {

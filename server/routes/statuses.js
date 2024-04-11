@@ -1,12 +1,22 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
+import AccessError from '../errors/AccessError.js';
+import HasTasksError from '../errors/HasTasksError.js';
 
 const isPermitted = (req) => {
   if (!req.isAuthenticated()) {
-    throw new Error(i18next.t('flash.authError'));
+    throw new AccessError(i18next.t('flash.authError'));
   }
 }
+
+const statusHasTasks = async (status) => {
+  const tasks = await status.getTasks();
+  if (tasks.length > 0) {
+    throw new HasTasksError();
+  }
+};
 
 export default (app) => {
   const Status = app.objection.models.status;
@@ -18,8 +28,12 @@ export default (app) => {
         const statuses = await Status.index();
         reply.render('statuses/index', { statuses });
       } catch (e) {
-        req.flash('error', e.message);
-        reply.redirect(app.reverse('root'));
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -29,25 +43,29 @@ export default (app) => {
         const status = new Status();
         reply.render('statuses/new', { status });
       } catch (e) {
-        req.flash('error', e.message);
-        reply.redirect(app.reverse('root'));
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
+        }
       }
     })
-    .get(
-      '/statuses/:id/edit',
-      // { name: 'editUser', preHandler: app.fp.authenticate },
-      async (req, reply) => {
-        try {
-          isPermitted(req);
-          const status = await Status.find(req.params.id);
-          reply.render('statuses/edit', { status });
-        } catch (e) {
+    .get('/statuses/:id/edit', async (req, reply) => {
+      try {
+        isPermitted(req);
+        const status = await Status.find(req.params.id);
+        reply.render('statuses/edit', { status });
+      } catch (e) {
+        if (e instanceof AccessError) {
           req.flash('error', e.message);
           reply.redirect(app.reverse('statuses'));
+        } else {
+          throw e;
         }
-        return reply;
       }
-    )
+      return reply;
+    })
     .post('/statuses', async (req, reply) => {
       const status = new Status();
       status.$set(req.body.data);
@@ -56,9 +74,16 @@ export default (app) => {
         await Status.create(req.body.data);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('root'));
-      } catch ({ data }) {
-        req.flash('error', i18next.t('flash.statuses.create.error'));
-        reply.render('statuses/new', { status, errors: data });
+      } catch (e) {
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('statuses'));
+        } else if (e instanceof ValidationError) {
+          req.flash('error', i18next.t('flash.statuses.create.error'));
+          reply.render('statuses/new', { status, errors: e.data });
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -71,8 +96,15 @@ export default (app) => {
         req.flash('info', i18next.t('flash.statuses.edit.success'));
         reply.redirect(app.reverse('statuses'));
       } catch (e) {
-        req.flash('error', i18next.t('flash.statuses.edit.error'));
-        reply.render('statuses/edit', { status, errors: e.data });
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('statuses'));
+        } else if (e instanceof ValidationError) {
+          req.flash('error', i18next.t('flash.statuses.edit.error'));
+          reply.render('statuses/edit', { status, errors: e.data });
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -80,14 +112,15 @@ export default (app) => {
       try {
         isPermitted(req);
         const status = await Status.find(req.params.id);
-        const tasks = await status.getTasks();
-        if (tasks.length > 0) {
-          throw Error(i18next.t('flash.statuses.delete.hasTasks'));
-        }
+        await statusHasTasks(status);
         await Status.delete(req.params.id);
         req.flash('info', i18next.t('flash.statuses.delete.success'));
       } catch (e) {
-        req.flash('error', i18next.t('flash.statuses.delete.error'), e.message);
+        if (e instanceof AccessError || e instanceof HasTasksError) {
+          req.flash('error', [i18next.t('flash.statuses.delete.error'), e.message].join('. '));
+        } else {
+          throw e;
+        }
       }
       reply.redirect(app.reverse('statuses'));
       return reply;

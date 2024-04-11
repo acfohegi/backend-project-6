@@ -1,16 +1,18 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
+import AccessError from '../errors/AccessError.js';
 
 const isPermitted = (req) => {
   if (!req.isAuthenticated()) {
-    throw new Error(i18next.t('flash.authError'));
+    throw new AccessError(i18next.t('flash.authError'));
   }
 };
 
 const isTaskOwner = (req) => {
   if (req.user.id.toString() !== req.params.id) {
-    throw new Error(i18next.t('flash.authError'));
+    throw new AccessError(i18next.t('flash.tasks.delete.notCreatorError'));
   }
 };
 
@@ -57,12 +59,15 @@ export default (app) => {
         const statuses = await Status.index();
         const users = await User.index();
         const labels = await Label.index();
-        app.log.debug(filters);
+        app.log.debug(['tasks with filters:', filters]);
         reply.render('tasks/index', { filters, tasks, statuses, users, labels });
       } catch (e) {
-        app.log.error(e);
-        req.flash('error', e.message);
-        reply.redirect(app.reverse('root'));
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -76,8 +81,12 @@ export default (app) => {
         const selectedLabels = [];
         reply.render('tasks/new', { task, statuses, users, labels, selectedLabels });
       } catch (e) {
-        req.flash('error', e.message);
-        reply.redirect(app.reverse('root'));
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -91,30 +100,34 @@ export default (app) => {
         const executor = await task.getExecutor();
         reply.render('tasks/show', { task, labels, status, creator, executor });
       } catch (e) {
-        req.flash('error', e.message);
-        reply.redirect(app.reverse('root'));
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
-    .get(
-      '/tasks/:id/edit',
-      // { name: 'editUser', preHandler: app.fp.authenticate },
-      async (req, reply) => {
-        const statuses = await Status.index();
-        const users = await User.index();
-        const labels = await Label.index();
-        try {
-          isPermitted(req);
-          const task = await Task.find(req.params.id);
-          const selectedLabels = await task.getLabelIds();
-          reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels });
-        } catch (e) {
+    .get('/tasks/:id/edit', async (req, reply) => {
+      const statuses = await Status.index();
+      const users = await User.index();
+      const labels = await Label.index();
+      try {
+        isPermitted(req);
+        const task = await Task.find(req.params.id);
+        const selectedLabels = await task.getLabelIds();
+        reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels });
+      } catch (e) {
+        if (e instanceof AccessError) {
           req.flash('error', e.message);
-          reply.redirect(app.reverse('tasks'));
+          reply.redirect(app.reverse('root'));
+        } else {
+          throw e;
         }
-        return reply;
       }
-    )
+      return reply;
+    })
     .post('/tasks', async (req, reply) => {
       const { name, description, statusId, executorId, labels } = req.body.data;
       const taskData = {
@@ -134,11 +147,18 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
-        const statuses = await Status.index();
-        const users = await User.index();
-        const labels = await Label.index();
-        req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.render('tasks/new', { task, statuses, users, labels, selectedLabels, errors: e.data });
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else if (e instanceof ValidationError) {
+          const statuses = await Status.index();
+          const users = await User.index();
+          const labels = await Label.index();
+          req.flash('error', i18next.t('flash.tasks.create.error'));
+          reply.render('tasks/new', { task, statuses, users, labels, selectedLabels, errors: e.data });
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -161,11 +181,18 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
-        const statuses = await Status.index();
-        const users = await User.index();
-        const labels = await Label.index();
-        req.flash('error', i18next.t('flash.tasks.edit.error'));
-        reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels, errors: e.data });
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('root'));
+        } else if (e instanceof ValidationError) {
+          const statuses = await Status.index();
+          const users = await User.index();
+          const labels = await Label.index();
+          req.flash('error', i18next.t('flash.tasks.edit.error'));
+          reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels, errors: e.data });
+        } else {
+          throw e;
+        }
       }
       return reply;
     })
@@ -176,7 +203,11 @@ export default (app) => {
         await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
       } catch (e) {
-        req.flash('error', i18next.t('flash.tasks.delete.error'));
+        if (e instanceof AccessError ) {
+          req.flash('error', [i18next.t('flash.tasks.delete.error'), e.message].join('. '));
+        } else {
+          throw e;
+        }
       }
       reply.redirect(app.reverse('tasks'));
       return reply;

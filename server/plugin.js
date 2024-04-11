@@ -16,6 +16,7 @@ import fastifyObjectionjs from 'fastify-objectionjs';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
+import Rollbar from 'rollbar';
 
 import ru from './locales/ru.js';
 import en from './locales/en.js';
@@ -62,7 +63,7 @@ const setupLocalization = async () => {
     .init({
       lng: 'en',
       fallbackLng: 'ru',
-      // debug: isDevelopment,
+      debug: mode !== 'prodiction',
       resources: {
         ru,
         en,
@@ -70,11 +71,23 @@ const setupLocalization = async () => {
     });
 };
 
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
 const addHooks = (app) => {
   app.addHook('preHandler', async (req, reply) => {
     reply.locals = {
       isAuthenticated: () => req.isAuthenticated(),
     };
+  });
+  app.addHook('onError', async (req, reply, e) => {
+    app.log.error(e, req, reply);
+    if (mode === 'production') {
+      rollbar.error(e, req);
+    }
   });
 };
 
