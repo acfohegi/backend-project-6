@@ -9,7 +9,7 @@ const isPermitted = (req) => {
   if (!req.isAuthenticated()) {
     throw new AccessError(i18next.t('flash.authError'));
   }
-}
+};
 
 const statusHasTasks = async (status) => {
   const tasks = await status.getTasks();
@@ -126,4 +126,3 @@ export default (app) => {
       return reply;
     });
 };
-

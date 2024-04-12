@@ -1,4 +1,3 @@
 import AppError from './AppError.js';
 
-export default class AccessError extends AppError {};
-
+export default class AccessError extends AppError {}

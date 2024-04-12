@@ -7,7 +7,6 @@ import { faker } from '@faker-js/faker';
 import init from '../server/plugin.js';
 import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
 
-
 describe('test labels CRUD', () => {
   let app;
   let knex;
@@ -106,7 +105,9 @@ describe('test labels CRUD', () => {
     const labels = await task.getLabels();
     expect(labels.length).toBe(1);
     expect(labels[0].id).toBe(1);
-    const { name, description, executorId, statusId } = task;
+    const {
+      name, description, executorId, statusId,
+    } = task;
     const params = {
       name,
       description,
@@ -135,7 +136,7 @@ describe('test labels CRUD', () => {
     const tasksLabels = await models.taskLabel.query();
     for (const { id } of tasksLabels) {
       await models.taskLabel.query().deleteById(id);
-    };
+    }
 
     const tasksLabels2 = await models.taskLabel.query();
     const tasks2 = await models.task.query();
@@ -147,7 +148,7 @@ describe('test labels CRUD', () => {
 
   it('successful deletion of label which has no associated tasks', async () => {
     const label = await models.label.query().findById(3);
-    const tasksForLabel = await models.taskLabel.query().where('labelId', 3)
+    const tasksForLabel = await models.taskLabel.query().where('labelId', 3);
     expect(tasksForLabel).toStrictEqual([]);
     const response = await app.inject({
       method: 'DELETE',
@@ -214,7 +215,7 @@ describe('test labels CRUD', () => {
     });
 
     expect(response.statusCode).toBe(302);
-    const tasks = await models.task.query().orderBy('id', 'desc').limit(1)
+    const tasks = await models.task.query().orderBy('id', 'desc').limit(1);
     const relatedLabels = await tasks[0].getLabels();
     expect(tasks[0]).toMatchObject(params);
     expect(relatedLabels).toStrictEqual([]);
@@ -225,7 +226,9 @@ describe('test labels CRUD', () => {
     const labels = await task.getLabels();
     expect(labels.length).toBe(2);
 
-    const { name, description, statusId, creatorId, executorId } = task;
+    const {
+      name, description, statusId, creatorId, executorId,
+    } = task;
     const params = {
       name,
       description,
@@ -256,4 +259,3 @@ describe('test labels CRUD', () => {
     await app.close();
   });
 });
-

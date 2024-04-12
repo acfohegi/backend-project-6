@@ -31,4 +31,3 @@ export const authenticateRequests = async (app, email) => {
     await req.logIn(user);
   });
 };
-

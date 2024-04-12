@@ -17,4 +17,3 @@ const controllers = [
 ];
 
 export default (app) => controllers.forEach((f) => f(app));
-

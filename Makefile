@@ -1,4 +1,4 @@
-setup: prepare install db-migrate 
+setup: prepare install db-migrate
 
 prepare:
 	cp -n .env.example .env || true

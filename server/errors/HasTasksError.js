@@ -5,5 +5,4 @@ export default class HasTasksError extends AppError {
   constructor(message = i18next.t('flash.hasTasksError')) {
     super(message);
   }
-};
-
+}

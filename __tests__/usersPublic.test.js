@@ -89,4 +89,3 @@ describe('test users CRUD for unauthenticated', () => {
     await app.close();
   });
 });
-

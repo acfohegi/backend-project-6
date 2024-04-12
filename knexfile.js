@@ -24,11 +24,10 @@ export const development = {
   connection: {
     filename: path.resolve(__dirname, 'database.sqlite'),
   },
-  debug: true
+  debug: true,
 };
 
 export const test = {
   ...development,
   connection: ':memory:',
 };
-

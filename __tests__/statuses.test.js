@@ -7,7 +7,6 @@ import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
 
-
 describe('test statuses CRUD', () => {
   let app;
   let knex;
@@ -88,4 +87,3 @@ describe('test statuses CRUD', () => {
     await app.close();
   });
 });
-

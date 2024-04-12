@@ -47,7 +47,7 @@ export default (app) => {
           }
         }
         return reply;
-      }
+      },
     )
     .post('/users', async (req, reply) => {
       const user = new User();
@@ -104,6 +104,5 @@ export default (app) => {
       }
       reply.redirect(app.reverse('users'));
       return reply;
-    })
+    });
 };
-

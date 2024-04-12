@@ -147,4 +147,3 @@ export default async (app, _options) => {
 
   return app;
 };
-

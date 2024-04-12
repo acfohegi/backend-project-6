@@ -33,7 +33,9 @@ const parseFilters = (req) => {
     }
     return Array.isArray(data) ? data : [data];
   };
-  const { status, executor, label, creator, isCreatorUser } = req.query;
+  const {
+    status, executor, label, creator, isCreatorUser,
+  } = req.query;
   return {
     status: parse(status),
     executor: parse(executor),
@@ -60,7 +62,9 @@ export default (app) => {
         const users = await User.index();
         const labels = await Label.index();
         app.log.debug(['tasks with filters:', filters]);
-        reply.render('tasks/index', { filters, tasks, statuses, users, labels });
+        reply.render('tasks/index', {
+          filters, tasks, statuses, users, labels,
+        });
       } catch (e) {
         if (e instanceof AccessError) {
           req.flash('error', e.message);
@@ -79,7 +83,9 @@ export default (app) => {
         const users = await User.index();
         const labels = await Label.index();
         const selectedLabels = [];
-        reply.render('tasks/new', { task, statuses, users, labels, selectedLabels });
+        reply.render('tasks/new', {
+          task, statuses, users, labels, selectedLabels,
+        });
       } catch (e) {
         if (e instanceof AccessError) {
           req.flash('error', e.message);
@@ -98,7 +104,9 @@ export default (app) => {
         const status = await task.getStatus();
         const creator = await task.getCreator();
         const executor = await task.getExecutor();
-        reply.render('tasks/show', { task, labels, status, creator, executor });
+        reply.render('tasks/show', {
+          task, labels, status, creator, executor,
+        });
       } catch (e) {
         if (e instanceof AccessError) {
           req.flash('error', e.message);
@@ -117,7 +125,9 @@ export default (app) => {
         isPermitted(req);
         const task = await Task.find(req.params.id);
         const selectedLabels = await task.getLabelIds();
-        reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels });
+        reply.render('tasks/edit', {
+          task, statuses, users, labels, selectedLabels,
+        });
       } catch (e) {
         if (e instanceof AccessError) {
           req.flash('error', e.message);
@@ -129,7 +139,9 @@ export default (app) => {
       return reply;
     })
     .post('/tasks', async (req, reply) => {
-      const { name, description, statusId, executorId, labels } = req.body.data;
+      const {
+        name, description, statusId, executorId, labels,
+      } = req.body.data;
       const taskData = {
         name,
         description,
@@ -155,7 +167,9 @@ export default (app) => {
           const users = await User.index();
           const labels = await Label.index();
           req.flash('error', i18next.t('flash.tasks.create.error'));
-          reply.render('tasks/new', { task, statuses, users, labels, selectedLabels, errors: e.data });
+          reply.render('tasks/new', {
+            task, statuses, users, labels, selectedLabels, errors: e.data,
+          });
         } else {
           throw e;
         }
@@ -163,7 +177,9 @@ export default (app) => {
       return reply;
     })
     .patch('/tasks/:id', async (req, reply) => {
-      const { name, description, statusId, executorId, labels } = req.body.data;
+      const {
+        name, description, statusId, executorId, labels,
+      } = req.body.data;
       const taskData = {
         name,
         description,
@@ -189,7 +205,9 @@ export default (app) => {
           const users = await User.index();
           const labels = await Label.index();
           req.flash('error', i18next.t('flash.tasks.edit.error'));
-          reply.render('tasks/edit', { task, statuses, users, labels, selectedLabels, errors: e.data });
+          reply.render('tasks/edit', {
+            task, statuses, users, labels, selectedLabels, errors: e.data,
+          });
         } else {
           throw e;
         }
@@ -203,7 +221,7 @@ export default (app) => {
         await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
       } catch (e) {
-        if (e instanceof AccessError ) {
+        if (e instanceof AccessError) {
           req.flash('error', [i18next.t('flash.tasks.delete.error'), e.message].join('. '));
         } else {
           throw e;
@@ -213,4 +231,3 @@ export default (app) => {
       return reply;
     });
 };
-

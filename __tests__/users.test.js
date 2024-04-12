@@ -72,4 +72,3 @@ describe('test users CRUD for authenticated', () => {
     await app.close();
   });
 });
-

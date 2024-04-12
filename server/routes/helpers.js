@@ -9,4 +9,3 @@ export default (app) => {
       return req.user.id;
     });
 };
-

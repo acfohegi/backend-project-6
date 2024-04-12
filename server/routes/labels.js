@@ -9,7 +9,7 @@ const isPermitted = (req) => {
   if (!req.isAuthenticated()) {
     throw new Error(i18next.t('flash.authError'));
   }
-}
+};
 
 const labelHasTasks = async (label) => {
   const relations = await label.hasTasks();
@@ -126,4 +126,3 @@ export default (app) => {
       return reply;
     });
 };
-

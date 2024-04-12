@@ -5,8 +5,9 @@ import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
-import { getTestData, getFixtureData, prepareData, authenticateRequests } from './helpers/index.js';
-
+import {
+  getTestData, getFixtureData, prepareData, authenticateRequests,
+} from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
   let app;
@@ -20,7 +21,6 @@ describe('test tasks CRUD', () => {
     '?status=2&executor=3&executor=2&label=3&isCreatorUser=on&creator=2',
     '?status=404&executor=404&executor=404&label=404&isCreatorUser=none&creator=404',
   ];
-
 
   beforeAll(async () => {
     app = fastify({
@@ -52,9 +52,9 @@ describe('test tasks CRUD', () => {
 
   it.each(taskFilters)('filters %s', async (_name, { filters, result }) => {
     const tasks = await models.task.index(filters);
-    const actual = tasks.map((t) => t.id)
+    const actual = tasks.map((t) => t.id);
     expect(actual).toStrictEqual(result);
-  })
+  });
 
   it('show', async () => {
     const response = await app.inject({
@@ -143,7 +143,7 @@ describe('test tasks CRUD', () => {
     });
 
     const updatedTask = await task.$query();
-    const whoamiResponse = await app.inject({ method: 'GET', url: '/whoami' });    const userId = parseInt(whoamiResponse.body);
+    const whoamiResponse = await app.inject({ method: 'GET', url: '/whoami' }); const userId = parseInt(whoamiResponse.body);
     expect(userId).not.toBe(task.creatorId);
     expect(response.statusCode).toBe(302);
     expect(updatedTask.creatorId).toBe(task.creatorId);
@@ -157,4 +157,3 @@ describe('test tasks CRUD', () => {
     await app.close();
   });
 });
-
