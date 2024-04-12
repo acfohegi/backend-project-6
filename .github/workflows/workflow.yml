@@ -72,5 +72,5 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: trigger deploy hook
+      - name: Trigger deploy hook
         run: curl ${{ secrets.DEPLOY_HOOK }}

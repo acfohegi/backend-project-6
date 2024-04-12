@@ -18,8 +18,17 @@ lint:
 test:
 	npm test -s
 
+test-coverage:
+	curl -L $(CC_TEST_REPORTER_LINK) > ./cc-test-reporter
+	chmod +x ./cc-test-reporter
+	./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.json coverage/lcov.info
+	./cc-test-reporter -r $(CC_TEST_REPORTER_ID) upload-coverage
+
 upload-test-coverage:
 	echo 'TODO'
+
+build:
+	npm run build
 
 docker-build:
 	docker-compose up tm-builder
@@ -27,10 +36,10 @@ docker-build:
 docker-build-run:
 	docker-compose up tm-app tm-db
 
-build:
-	npm run build
-
-build-setup:
+cloud-build:
 	export NODE_ENV=development && make install && make build && rm -rf node_modules && export NODE_ENV=production && make setup
+
+publish:
+	npm publish --dry-run
 
 .PHONY: build
