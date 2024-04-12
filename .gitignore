@@ -4,7 +4,8 @@ build/
 dist/
 tmp/
 temp/
+postgres/
 database.sqlite
 .env
-notes.js
+notes
 

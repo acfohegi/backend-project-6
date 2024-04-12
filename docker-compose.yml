@@ -1,12 +1,30 @@
 version: '3'
 services:
-  webpack-builder:
-    build: 
+  tm-app:
+    build: .
+    ports:
+      - 3000:10000
+    environment:
+      - DB_HOST=tm-db
+      - DB_PORT=5432
+      - DB_USER=tm_user
+      - DB_NAME=task_manager_db
+      - DB_PASSWORD=password
+  tm-db:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=tm_user
+      - POSTGRES_DB=task_manager_db
+  tm-builder:
+    build:
       context: .
       dockerfile: build/Dockerfile
+      args:
+        - NODE_ENV=development
     volumes:
       - ./dist:/app/dist
-  app:
-    build: .
-    ports: 
-      - 3000:3000

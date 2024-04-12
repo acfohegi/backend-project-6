@@ -11,7 +11,8 @@ RUN apk update && apk upgrade && apk add build-base python3
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app /app
-RUN make setup
+RUN make install
+RUN make prepare
 LABEL org.opencontainers.image.source https://github.com/acfohegi/task-manager
-CMD make start
+CMD make db-migrate && make start
 
