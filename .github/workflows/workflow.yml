@@ -60,7 +60,7 @@ jobs:
         with:
           node-version: '20.x'
       - name: Setup the app
-        run: make install && make build
+        run: make install && make prepare
       - name: Test
         run: make test
       - name: Upload test coverage
