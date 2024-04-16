@@ -6,9 +6,9 @@ export default {
     buttons: {
       edit: 'Изменить',
       delete: 'Удалить',
-      createStatus: 'Новый статус',
-      createTask: 'Новая задача',
-      createLabel: 'Новая метка',
+      createStatus: 'Создать статус',
+      createTask: 'Создать задачу',
+      createLabel: 'Создать метку',
     },
     flash: {
       labels: {
