@@ -18,10 +18,10 @@ const isTaskOwner = (req, task) => {
 
 const parseLabels = (labels) => {
   if (Array.isArray(labels)) {
-    return labels.map((l) => parseInt(l));
+    return labels.map((l) => parseInt(l, 10));
   }
   if (typeof labels === 'string') {
-    return [parseInt(labels)];
+    return [parseInt(labels, 10)];
   }
   return [];
 };
@@ -145,8 +145,8 @@ export default (app) => {
       const taskData = {
         name,
         description,
-        statusId: parseInt(statusId),
-        executorId: executorId === '' ? null : parseInt(executorId),
+        statusId: parseInt(statusId, 10),
+        executorId: executorId === '' ? null : parseInt(executorId, 10),
         creatorId: req.user.id,
       };
       const task = new Task();
@@ -165,6 +165,7 @@ export default (app) => {
         } else if (e instanceof ValidationError) {
           const statuses = await Status.index();
           const users = await User.index();
+          // eslint-disable-next-line no-shadow
           const labels = await Label.index();
           req.flash('error', i18next.t('flash.tasks.create.error'));
           reply.render('tasks/new', {
@@ -183,8 +184,8 @@ export default (app) => {
       const taskData = {
         name,
         description,
-        statusId: parseInt(statusId),
-        executorId: executorId === '' ? null : parseInt(executorId),
+        statusId: parseInt(statusId, 10),
+        executorId: executorId === '' ? null : parseInt(executorId, 10),
       };
       let task;
       const selectedLabels = parseLabels(labels);
@@ -203,6 +204,7 @@ export default (app) => {
         } else if (e instanceof ValidationError) {
           const statuses = await Status.index();
           const users = await User.index();
+          // eslint-disable-next-line no-shadow
           const labels = await Label.index();
           req.flash('error', i18next.t('flash.tasks.edit.error'));
           reply.render('tasks/edit', {

@@ -143,7 +143,7 @@ describe('test tasks CRUD', () => {
     });
 
     const updatedTask = await task.$query();
-    const whoamiResponse = await app.inject({ method: 'GET', url: '/whoami' }); const userId = parseInt(whoamiResponse.body);
+    const whoamiResponse = await app.inject({ method: 'GET', url: '/whoami' }); const userId = parseInt(whoamiResponse.body, 10);
     expect(userId).not.toBe(task.creatorId);
     expect(response.statusCode).toBe(302);
     expect(updatedTask.creatorId).toBe(task.creatorId);

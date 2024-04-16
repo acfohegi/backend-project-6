@@ -18,7 +18,6 @@ const userHasTasks = async (user) => {
 
 export default (app) => {
   const User = app.objection.models.user;
-  const Task = app.objection.models.task;
 
   app
     .get('/users', { name: 'users' }, async (req, reply) => {

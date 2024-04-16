@@ -91,6 +91,7 @@ export default (app) => {
       let status;
       try {
         isPermitted(req);
+        // eslint-disable-next-line no-shadow
         const status = await Status.find(req.params.id);
         await status.update(req.body.data);
         req.flash('info', i18next.t('flash.statuses.edit.success'));

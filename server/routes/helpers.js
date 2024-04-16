@@ -2,7 +2,7 @@
 
 export default (app) => {
   app
-    .get('/whoami', async (req, reply) => {
+    .get('/whoami', async (req) => {
       if (!req.isAuthenticated()) {
         return 'unknown';
       }

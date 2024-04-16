@@ -115,7 +115,7 @@ describe('test labels CRUD', () => {
       statusId,
       labels: [1, 2],
     };
-    const response = await app.inject({
+    await app.inject({
       method: 'PATCH',
       url: `/tasks/${task.id}`,
       payload: {
@@ -134,9 +134,11 @@ describe('test labels CRUD', () => {
     const labels = await models.label.query();
 
     const tasksLabels = await models.taskLabel.query();
+    /* eslint-disable */
     for (const { id } of tasksLabels) {
       await models.taskLabel.query().deleteById(id);
     }
+    /* eslint-disable */
 
     const tasksLabels2 = await models.taskLabel.query();
     const tasks2 = await models.task.query();

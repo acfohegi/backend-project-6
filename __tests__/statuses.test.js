@@ -4,14 +4,12 @@ import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
-import encrypt from '../server/lib/secure.cjs';
-import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
+import { prepareData, authenticateRequests } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
   let knex;
   let models;
-  const testData = getTestData();
 
   beforeAll(async () => {
     app = fastify({

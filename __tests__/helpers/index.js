@@ -21,7 +21,7 @@ export const prepareData = async (app) => {
 };
 
 export const authenticateRequests = async (app, email) => {
-  await app.addHook('preHandler', async (req, reply) => {
+  await app.addHook('preHandler', async (req) => {
     let user;
     if (email) {
       user = await app.objection.models.user.query().findOne({ email });
