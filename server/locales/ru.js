@@ -99,11 +99,11 @@ export default {
         actions: 'Действия',
         edit: {
           title: 'Изменение метки',
-          submit: 'Изменить метку',
+          submit: 'Изменить',
         },
         new: {
           title: 'Создание метки',
-          submit: 'Создать метку',
+          submit: 'Создать',
         },
       },
       session: {
@@ -119,11 +119,11 @@ export default {
         actions: 'Действия',
         edit: {
           title: 'Изменение статуса',
-          submit: 'Изменить статус',
+          submit: 'Изменить',
         },
         new: {
           title: 'Создание статуса',
-          submit: 'Создать статус',
+          submit: 'Создать',
         },
       },
       tasks: {
@@ -140,11 +140,11 @@ export default {
         actions: 'Действия',
         edit: {
           title: 'Изменение задачи',
-          submit: 'Изменить задачу',
+          submit: 'Изменить',
         },
         new: {
           title: 'Создание задачи',
-          submit: 'Создать задачу',
+          submit: 'Создать',
         },
       },
       users: {
