@@ -10,8 +10,8 @@ const isPermitted = (req) => {
   }
 };
 
-const isTaskOwner = (req) => {
-  if (req.user.id.toString() !== req.params.id) {
+const isTaskOwner = (req, task) => {
+  if (req.user.id !== task.creatorId) {
     throw new AccessError(i18next.t('flash.tasks.delete.notCreatorError'));
   }
 };
@@ -217,10 +217,14 @@ export default (app) => {
     .delete('/tasks/:id', async (req, reply) => {
       try {
         isPermitted(req);
-        isTaskOwner(req);
+        const task = await Task.find(req.params.id);
+        app.log.debug(task);
+        app.log.debug(req.user);
+        isTaskOwner(req, task);
         await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
       } catch (e) {
+        app.log.error(e);// DELETE
         if (e instanceof AccessError) {
           req.flash('error', [i18next.t('flash.tasks.delete.error'), e.message].join('. '));
         } else {
