@@ -73,7 +73,7 @@ export default (app) => {
         isPermitted(req);
         await Status.create(req.body.data);
         req.flash('info', i18next.t('flash.statuses.create.success'));
-        reply.redirect(app.reverse('root'));
+        reply.redirect(app.reverse('statuses'));
       } catch (e) {
         if (e instanceof AccessError) {
           req.flash('error', e.message);
