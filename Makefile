@@ -24,9 +24,6 @@ test-coverage:
 	./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.json coverage/lcov.info
 	./cc-test-reporter -r $(CC_TEST_REPORTER_ID) upload-coverage
 
-upload-test-coverage:
-	echo 'TODO'
-
 build:
 	npm run build
 

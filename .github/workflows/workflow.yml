@@ -64,7 +64,7 @@ jobs:
       - name: Test
         run: make test
       - name: Upload test coverage
-        run: make upload-test-coverage
+        run: make test-coverage
 
   release:
     needs: [test, build]

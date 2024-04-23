@@ -1,6 +1,7 @@
 .vscode/
 node_modules/
 build/
+coverage/
 dist/
 tmp/
 temp/
@@ -8,4 +9,5 @@ postgres/
 database.sqlite
 .env
 notes
+cc-test-reporter
 

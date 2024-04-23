@@ -6,7 +6,7 @@
    "main": "server/plugin.js",
    "scripts": {
       "prebuild": "rm -rf dist/*",
-      "test": "jest --verbose --runInBand",
+      "test": "jest --verbose --runInBand --coverage",
       "build": "npx webpack",
       "start": "npx fastify start server/plugin.js --log-level debug --pretty-logs --options --port 10000 --address 0.0.0.0"
    },
