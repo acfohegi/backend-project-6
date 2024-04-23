@@ -7,6 +7,12 @@ module.exports = class BaseModel extends Model {
     return [__dirname];
   }
 
+  $beforeUpdate() {
+    // on a model level because knex can't do it for postgres on schema level
+    // https://github.com/knex/knex/issues/1928
+    this.updated_at = new Date().toISOString();
+  }
+
   static async find(id, db) {
     return await this.query(db).findById(id);
   }
