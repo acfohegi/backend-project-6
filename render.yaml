@@ -1,0 +1,30 @@
+databases:
+- name: tm_postgres
+  databaseName: task_manager_qi22
+  user: tm_user
+  plan: free
+  region: frankfurt
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
+services:
+- type: web
+  name: task-manager
+  runtime: node
+  repo: https://github.com/acfohegi/task-manager
+  plan: free
+  envVars:
+  - key: ROLLBAR_TOKEN
+    sync: false
+  - key: NODE_ENV
+    sync: false
+  - key: DB_CONNECTION_STRING
+    fromDatabase:
+      name: tm_postgres
+      property: connectionString
+  region: frankfurt
+  buildCommand: make cloud-build
+  startCommand: make start
+  autoDeploy: false
+version: "1"
