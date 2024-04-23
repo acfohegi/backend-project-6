@@ -64,6 +64,9 @@ jobs:
       - name: Test
         run: make test
       - name: Upload test coverage
+        env:
+          CC_TEST_REPORTER_LINK: ${{ secrets.CC_TEST_REPORTER_LINK }}
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         run: make test-coverage
 
   release:
