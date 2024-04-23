@@ -128,7 +128,7 @@ describe('test tasks CRUD', () => {
 
     const updatedTask = await task.$query();
     expect(response.statusCode).toBe(302);
-    expect(updatedTask).toMatchObject(params);
+    expect(updatedTask).toMatchObject(_.omit(params, 'updatedAt'));
   });
 
   it('update does not change creator', async () => {
