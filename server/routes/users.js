@@ -3,8 +3,8 @@ import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 import HasTasksError from '../errors/HasTasksError.js';
 
-const isPermitted = (req) => {
-  if (!req.isAuthenticated() || req.user.id.toString() !== req.params.id) {
+const isUser = (req) => {
+  if (req.user.id.toString() !== req.params.id) {
     throw new AccessError(i18next.t('flash.authError'));
   }
 };
@@ -30,24 +30,22 @@ export default (app) => {
       reply.render('users/new', { user });
     })
     .get(
-      '/users/:id/edit',
-      // { name: 'editUser', preHandler: app.fp.authenticate },
-      async (req, reply) => {
-        try {
-          isPermitted(req);
-          const user = await User.find(req.params.id);
-          reply.render('users/edit', { user });
-        } catch (e) {
-          if (e instanceof AccessError) {
-            req.flash('error', e.message);
-            reply.redirect(app.reverse('users'));
-          } else {
-            throw e;
-          }
+      '/users/:id/edit', async (req, reply) => {
+      try {
+        app.isPermitted(req);
+        isUser(req);
+        const user = await User.find(req.params.id);
+        reply.render('users/edit', { user });
+      } catch (e) {
+        if (e instanceof AccessError) {
+          req.flash('error', e.message);
+          reply.redirect(app.reverse('users'));
+        } else {
+          throw e;
         }
-        return reply;
-      },
-    )
+      }
+      return reply;
+    })
     .post('/users', async (req, reply) => {
       const user = new User();
       user.$set(req.body.data);
@@ -68,7 +66,8 @@ export default (app) => {
     .patch('/users/:id', async (req, reply) => {
       let user;
       try {
-        isPermitted(req);
+        app.isPermitted(req);
+        isUser(req);
         user = await User.find(req.params.id);
         await user.update(req.body.data);
         req.flash('info', i18next.t('flash.users.edit.success'));
@@ -88,7 +87,8 @@ export default (app) => {
     })
     .delete('/users/:id', async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
+        isUser(req);
         const user = await User.find(req.params.id);
         await userHasTasks(user);
         await User.delete(req.params.id);

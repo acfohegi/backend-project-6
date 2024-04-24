@@ -4,12 +4,6 @@ import i18next from 'i18next';
 import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 
-const isPermitted = (req) => {
-  if (!req.isAuthenticated()) {
-    throw new AccessError(i18next.t('flash.authError'));
-  }
-};
-
 const isTaskOwner = (req, task) => {
   if (req.user.id !== task.creatorId) {
     throw new AccessError(i18next.t('flash.tasks.delete.notCreatorError'));
@@ -55,7 +49,7 @@ export default (app) => {
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const filters = parseFilters(req);
         const tasks = await Task.index(filters);
         const statuses = await Status.index();
@@ -77,7 +71,7 @@ export default (app) => {
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const task = new Task();
         const statuses = await Status.index();
         const users = await User.index();
@@ -98,7 +92,7 @@ export default (app) => {
     })
     .get('/tasks/:id', async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const task = await Task.find(req.params.id);
         const labels = await task.getLabels();
         const status = await task.getStatus();
@@ -122,7 +116,7 @@ export default (app) => {
       const users = await User.index();
       const labels = await Label.index();
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const task = await Task.find(req.params.id);
         const selectedLabels = await task.getLabelIds();
         reply.render('tasks/edit', {
@@ -154,7 +148,7 @@ export default (app) => {
       task.$set(taskData);
       task.$setRelated('labels', selectedLabels);
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         await Task.create(taskData, selectedLabels);
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
@@ -190,7 +184,7 @@ export default (app) => {
       let task;
       const selectedLabels = parseLabels(labels);
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         task = await Task.find(req.params.id);
         task.$set(taskData);
         task.$setRelated('labels', selectedLabels);
@@ -218,7 +212,7 @@ export default (app) => {
     })
     .delete('/tasks/:id', async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const task = await Task.find(req.params.id);
         app.log.debug(task);
         app.log.debug(req.user);
@@ -226,7 +220,6 @@ export default (app) => {
         await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));
       } catch (e) {
-        app.log.error(e);// DELETE
         if (e instanceof AccessError) {
           req.flash('error', [i18next.t('flash.tasks.delete.error'), e.message].join('. '));
         } else {

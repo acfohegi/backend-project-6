@@ -27,6 +27,7 @@ import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+import AccessError from './errors/AccessError.js';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 const mode = process.env.NODE_ENV || 'development';
@@ -119,6 +120,11 @@ const registerPlugins = async (app) => {
     },
   // @ts-ignore
   )(...args));
+  app.decorate('isPermitted', (req) => {
+    if (!req.isAuthenticated()) {
+      throw new AccessError(i18next.t('flash.authError'));
+    }
+  });
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {

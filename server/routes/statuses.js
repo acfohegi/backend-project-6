@@ -5,12 +5,6 @@ import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 import HasTasksError from '../errors/HasTasksError.js';
 
-const isPermitted = (req) => {
-  if (!req.isAuthenticated()) {
-    throw new AccessError(i18next.t('flash.authError'));
-  }
-};
-
 const statusHasTasks = async (status) => {
   const tasks = await status.getTasks();
   if (tasks.length > 0) {
@@ -24,7 +18,7 @@ export default (app) => {
   app
     .get('/statuses', { name: 'statuses' }, async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const statuses = await Status.index();
         reply.render('statuses/index', { statuses });
       } catch (e) {
@@ -39,7 +33,7 @@ export default (app) => {
     })
     .get('/statuses/new', { name: 'newStatus' }, (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const status = new Status();
         reply.render('statuses/new', { status });
       } catch (e) {
@@ -53,7 +47,7 @@ export default (app) => {
     })
     .get('/statuses/:id/edit', async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const status = await Status.find(req.params.id);
         reply.render('statuses/edit', { status });
       } catch (e) {
@@ -70,7 +64,7 @@ export default (app) => {
       const status = new Status();
       status.$set(req.body.data);
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         await Status.create(req.body.data);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));
@@ -90,7 +84,7 @@ export default (app) => {
     .patch('/statuses/:id', async (req, reply) => {
       let status;
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         // eslint-disable-next-line no-shadow
         const status = await Status.find(req.params.id);
         await status.update(req.body.data);
@@ -111,7 +105,7 @@ export default (app) => {
     })
     .delete('/statuses/:id', async (req, reply) => {
       try {
-        isPermitted(req);
+        app.isPermitted(req);
         const status = await Status.find(req.params.id);
         await statusHasTasks(status);
         await Status.delete(req.params.id);
