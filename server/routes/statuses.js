@@ -18,7 +18,7 @@ export default (app) => {
   app
     .get('/statuses', { name: 'statuses' }, async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const statuses = await Status.index();
         reply.render('statuses/index', { statuses });
       } catch (e) {
@@ -33,7 +33,7 @@ export default (app) => {
     })
     .get('/statuses/new', { name: 'newStatus' }, (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const status = new Status();
         reply.render('statuses/new', { status });
       } catch (e) {
@@ -47,7 +47,7 @@ export default (app) => {
     })
     .get('/statuses/:id/edit', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const status = await Status.find(req.params.id);
         reply.render('statuses/edit', { status });
       } catch (e) {
@@ -64,7 +64,7 @@ export default (app) => {
       const status = new Status();
       status.$set(req.body.data);
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         await Status.create(req.body.data);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));
@@ -84,7 +84,7 @@ export default (app) => {
     .patch('/statuses/:id', async (req, reply) => {
       let status;
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         // eslint-disable-next-line no-shadow
         const status = await Status.find(req.params.id);
         await status.update(req.body.data);
@@ -105,7 +105,7 @@ export default (app) => {
     })
     .delete('/statuses/:id', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const status = await Status.find(req.params.id);
         await statusHasTasks(status);
         await Status.delete(req.params.id);

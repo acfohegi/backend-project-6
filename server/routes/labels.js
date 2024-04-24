@@ -18,7 +18,7 @@ export default (app) => {
   app
     .get('/labels', { name: 'labels' }, async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const labels = await Label.index();
         reply.render('labels/index', { labels });
       } catch (e) {
@@ -33,7 +33,7 @@ export default (app) => {
     })
     .get('/labels/new', { name: 'newLabel' }, (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const label = new Label();
         reply.render('labels/new', { label });
       } catch (e) {
@@ -47,7 +47,7 @@ export default (app) => {
     })
     .get('/labels/:id/edit', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const label = await Label.find(req.params.id);
         reply.render('labels/edit', { label });
       } catch (e) {
@@ -64,7 +64,7 @@ export default (app) => {
       const label = new Label();
       label.$set(req.body.data);
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         await Label.create(req.body.data);
         req.flash('info', i18next.t('flash.labels.create.success'));
         reply.redirect(app.reverse('labels'));
@@ -84,7 +84,7 @@ export default (app) => {
     .patch('/labels/:id', async (req, reply) => {
       let label;
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         label = await Label.find(req.params.id);
         await label.update(req.body.data);
         req.flash('info', i18next.t('flash.labels.edit.success'));
@@ -104,7 +104,7 @@ export default (app) => {
     })
     .delete('/labels/:id', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         const label = await Label.find(req.params.id);
         await labelHasTasks(label);
         await Label.delete(label.id);

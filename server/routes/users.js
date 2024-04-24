@@ -32,7 +32,7 @@ export default (app) => {
     .get(
       '/users/:id/edit', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         isUser(req);
         const user = await User.find(req.params.id);
         reply.render('users/edit', { user });
@@ -66,7 +66,7 @@ export default (app) => {
     .patch('/users/:id', async (req, reply) => {
       let user;
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         isUser(req);
         user = await User.find(req.params.id);
         await user.update(req.body.data);
@@ -87,7 +87,7 @@ export default (app) => {
     })
     .delete('/users/:id', async (req, reply) => {
       try {
-        app.isPermitted(req);
+        req.isPermitted();
         isUser(req);
         const user = await User.find(req.params.id);
         await userHasTasks(user);

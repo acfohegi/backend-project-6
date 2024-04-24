@@ -120,8 +120,8 @@ const registerPlugins = async (app) => {
     },
   // @ts-ignore
   )(...args));
-  app.decorate('isPermitted', (req) => {
-    if (!req.isAuthenticated()) {
+  app.decorateRequest('isPermitted', function () {
+    if (!this.isAuthenticated()) {
       throw new AccessError(i18next.t('flash.authError'));
     }
   });
