@@ -2,19 +2,7 @@ import i18next from 'i18next';
 import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 import HasTasksError from '../errors/HasTasksError.js';
-
-const isUser = (req) => {
-  if (req.user.id.toString() !== req.params.id) {
-    throw new AccessError(i18next.t('flash.authError'));
-  }
-};
-
-const userHasTasks = async (user) => {
-  const tasks = await user.getTasks();
-  if (tasks.length > 0) {
-    throw new HasTasksError();
-  }
-};
+import { isUser, userHasTasks } from './helpers/users.js';
 
 export default (app) => {
   const User = app.objection.models.user;
@@ -29,8 +17,7 @@ export default (app) => {
       const user = new User();
       reply.render('users/new', { user });
     })
-    .get(
-      '/users/:id/edit', async (req, reply) => {
+    .get('/users/:id/edit', async (req, reply) => {
       try {
         req.isPermitted();
         isUser(req);

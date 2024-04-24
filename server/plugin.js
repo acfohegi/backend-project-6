@@ -22,7 +22,7 @@ import ru from './locales/ru.js';
 import en from './locales/en.js';
 // @ts-ignore
 import addRoutes from './routes/index.js';
-import addHelperRoutes from './routes/helpers.js';
+import addHelperRoutes from './helpers/addHelperRoutes.js';
 import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';

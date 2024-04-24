@@ -4,13 +4,7 @@ import i18next from 'i18next';
 import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 import HasTasksError from '../errors/HasTasksError.js';
-
-const statusHasTasks = async (status) => {
-  const tasks = await status.getTasks();
-  if (tasks.length > 0) {
-    throw new HasTasksError();
-  }
-};
+import { statusHasTasks } from './helpers/hasTasks.js';
 
 export default (app) => {
   const Status = app.objection.models.status;

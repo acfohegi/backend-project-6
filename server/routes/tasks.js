@@ -3,42 +3,9 @@
 import i18next from 'i18next';
 import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
-
-const isTaskOwner = (req, task) => {
-  if (req.user.id !== task.creatorId) {
-    throw new AccessError(i18next.t('flash.tasks.delete.notCreatorError'));
-  }
-};
-
-const parseLabels = (labels) => {
-  if (Array.isArray(labels)) {
-    return labels.map((l) => parseInt(l, 10));
-  }
-  if (typeof labels === 'string') {
-    return [parseInt(labels, 10)];
-  }
-  return [];
-};
-
-const parseFilters = (req) => {
-  const parse = (data) => {
-    if (!data) {
-      return [];
-    }
-    return Array.isArray(data) ? data : [data];
-  };
-  const {
-    status, executor, label, creator, isCreatorUser,
-  } = req.query;
-  return {
-    status: parse(status),
-    executor: parse(executor),
-    label: parse(label),
-    // query parameter 'isCreatorUser' is made in consent with requirements
-    // it will override direct creator query
-    creator: isCreatorUser === 'on' ? [req.user.id] : parse(creator),
-  };
-};
+import {
+  isTaskOwner, parseFilters, parseLabels, parseTaskData,
+} from './helpers/tasks.js';
 
 export default (app) => {
   const Task = app.objection.models.task;
@@ -47,28 +14,38 @@ export default (app) => {
   const Label = app.objection.models.label;
 
   app
-    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
-      try {
-        req.isPermitted();
-        const filters = parseFilters(req);
-        const tasks = await Task.index(filters);
-        const statuses = await Status.index();
-        const users = await User.index();
-        const labels = await Label.index();
-        app.log.debug(['tasks with filters:', filters]);
-        reply.render('tasks/index', {
-          filters, tasks, statuses, users, labels,
-        });
-      } catch (e) {
-        if (e instanceof AccessError) {
-          req.flash('error', e.message);
-          reply.redirect(app.reverse('root'));
-        } else {
-          throw e;
+    .get(
+      '/tasks',
+      {
+        name: 'tasks',
+        preHandler: (req, _reply, done) => {
+          req.filters = parseFilters(req);
+          done();
+        },
+      },
+      async (req, reply) => {
+        try {
+          req.isPermitted();
+          const { filters } = req;
+          const tasks = await Task.index(filters);
+          const statuses = await Status.index();
+          const users = await User.index();
+          const labels = await Label.index();
+          app.log.debug(['tasks with filters:', filters]);
+          reply.render('tasks/index', {
+            filters, tasks, statuses, users, labels,
+          });
+        } catch (e) {
+          if (e instanceof AccessError) {
+            req.flash('error', e.message);
+            reply.redirect(app.reverse('root'));
+          } else {
+            throw e;
+          }
         }
-      }
-      return reply;
-    })
+        return reply;
+      },
+    )
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       try {
         req.isPermitted();
@@ -132,24 +109,20 @@ export default (app) => {
       }
       return reply;
     })
-    .post('/tasks', async (req, reply) => {
-      const {
-        name, description, statusId, executorId, labels,
-      } = req.body.data;
-      const taskData = {
-        name,
-        description,
-        statusId: parseInt(statusId, 10),
-        executorId: executorId === '' ? null : parseInt(executorId, 10),
-        creatorId: req.user.id,
-      };
+    .post('/tasks', {
+      preHandler: (req, _reply, done) => {
+        req.selectedLabels = parseLabels(req);
+        req.taskData = parseTaskData(req);
+        req.taskData.creatorId = req.user.id;
+        done();
+      },
+    }, async (req, reply) => {
       const task = new Task();
-      const selectedLabels = parseLabels(labels);
-      task.$set(taskData);
-      task.$setRelated('labels', selectedLabels);
+      task.$set(req.taskData);
+      task.$setRelated('labels', req.selectedLabels);
       try {
         req.isPermitted();
-        await Task.create(taskData, selectedLabels);
+        await Task.create(req.taskData, req.selectedLabels);
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
@@ -161,6 +134,7 @@ export default (app) => {
           const users = await User.index();
           // eslint-disable-next-line no-shadow
           const labels = await Label.index();
+          const { selectedLabels } = req;
           req.flash('error', i18next.t('flash.tasks.create.error'));
           reply.render('tasks/new', {
             task, statuses, users, labels, selectedLabels, errors: e.data,
@@ -171,24 +145,20 @@ export default (app) => {
       }
       return reply;
     })
-    .patch('/tasks/:id', async (req, reply) => {
-      const {
-        name, description, statusId, executorId, labels,
-      } = req.body.data;
-      const taskData = {
-        name,
-        description,
-        statusId: parseInt(statusId, 10),
-        executorId: executorId === '' ? null : parseInt(executorId, 10),
-      };
+    .patch('/tasks/:id', {
+      preHandler: (req, _reply, done) => {
+        req.selectedLabels = parseLabels(req);
+        req.taskData = parseTaskData(req);
+        done();
+      },
+    }, async (req, reply) => {
       let task;
-      const selectedLabels = parseLabels(labels);
       try {
         req.isPermitted();
         task = await Task.find(req.params.id);
-        task.$set(taskData);
-        task.$setRelated('labels', selectedLabels);
-        await task.update(taskData, selectedLabels);
+        task.$set(req.taskData);
+        task.$setRelated('labels', req.selectedLabels);
+        await task.update(req.taskData, req.selectedLabels);
         req.flash('info', i18next.t('flash.tasks.edit.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
@@ -200,6 +170,7 @@ export default (app) => {
           const users = await User.index();
           // eslint-disable-next-line no-shadow
           const labels = await Label.index();
+          const { selectedLabels } = req;
           req.flash('error', i18next.t('flash.tasks.edit.error'));
           reply.render('tasks/edit', {
             task, statuses, users, labels, selectedLabels, errors: e.data,

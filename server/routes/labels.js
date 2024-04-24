@@ -4,13 +4,7 @@ import i18next from 'i18next';
 import { ValidationError } from 'objection';
 import AccessError from '../errors/AccessError.js';
 import HasTasksError from '../errors/HasTasksError.js';
-
-const labelHasTasks = async (label) => {
-  const relations = await label.hasTasks();
-  if (relations) {
-    throw new HasTasksError();
-  }
-};
+import { labelHasTasks } from './helpers/hasTasks.js';
 
 export default (app) => {
   const Label = app.objection.models.label;
