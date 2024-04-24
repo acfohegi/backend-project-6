@@ -185,8 +185,6 @@ export default (app) => {
       try {
         req.isPermitted();
         const task = await Task.find(req.params.id);
-        app.log.debug(task);
-        app.log.debug(req.user);
         isTaskOwner(req, task);
         await Task.delete(req.params.id);
         req.flash('info', i18next.t('flash.tasks.delete.success'));

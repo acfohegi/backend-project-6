@@ -1,14 +1,20 @@
 [
   {
-    "id": 1,
-    "name": "label for multiple tasks"
-  },
-  {
-    "id": 2,
-    "name": "label for one task"
-  },
-  {
-    "id": 3,
-    "name": "label with no tasks"
+    "table": "labels",
+    "data":
+      [
+        {
+          "id": 1,
+          "name": "label for multiple tasks"
+        },
+        {
+          "id": 2,
+          "name": "label for one task"
+        },
+        {
+          "id": 3,
+          "name": "label with no tasks"
+        }
+      ]
   }
 ]

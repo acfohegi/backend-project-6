@@ -6,21 +6,16 @@ import { faker } from '@faker-js/faker';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, getFixtureData, prepareData, authenticateRequests,
+  getTestData, prepareData, authenticateRequests,
 } from './helpers/index.js';
+import taskFilters from '../__fixtures__/taskFilters.js';
+import indexQueries from '../__fixtures__/indexQueries.js';
 
 describe('test tasks CRUD', () => {
   let app;
   let knex;
   let models;
-  const testData = getTestData();
-  const taskFilters = getFixtureData('task_filters.json');
-  const indexQueries = [
-    '',
-    '?status=2&label=2',
-    '?status=2&executor=3&executor=2&label=3&isCreatorUser=on&creator=2',
-    '?status=404&executor=404&executor=404&label=404&isCreatorUser=none&creator=404',
-  ];
+  let testData;
 
   beforeAll(async () => {
     app = fastify({
@@ -31,6 +26,7 @@ describe('test tasks CRUD', () => {
     knex = app.objection.knex;
     models = app.objection.models;
     await authenticateRequests(app);
+    testData = await getTestData();
   });
 
   beforeEach(async () => {

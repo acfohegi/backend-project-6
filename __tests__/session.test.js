@@ -18,7 +18,7 @@ describe('test session', () => {
     knex = app.objection.knex;
     await knex.migrate.latest();
     await prepareData(app);
-    testData = getTestData();
+    testData = await getTestData();
   });
 
   it('test sign in / sign out', async () => {

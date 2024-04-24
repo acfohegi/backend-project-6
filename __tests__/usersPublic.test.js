@@ -11,7 +11,7 @@ describe('test users CRUD for unauthenticated', () => {
   let app;
   let knex;
   let models;
-  const testData = getTestData();
+  let testData;
 
   beforeAll(async () => {
     app = fastify({
@@ -21,6 +21,7 @@ describe('test users CRUD for unauthenticated', () => {
     await init(app);
     knex = app.objection.knex;
     models = app.objection.models;
+    testData = await getTestData();
   });
 
   beforeEach(async () => {

@@ -11,7 +11,7 @@ describe('test labels CRUD', () => {
   let app;
   let knex;
   let models;
-  const testData = getTestData();
+  let testData;
 
   beforeAll(async () => {
     app = fastify({
@@ -22,6 +22,7 @@ describe('test labels CRUD', () => {
     knex = app.objection.knex;
     models = app.objection.models;
     await authenticateRequests(app);
+    testData = await getTestData();
   });
 
   beforeEach(async () => {
