@@ -4,33 +4,22 @@ import {
   describe, beforeAll, it, expect,
 } from '@jest/globals';
 
-import fastify from 'fastify';
-import init from '../server/plugin.js';
+import testFastify from './helpers/app.js';
 
 describe('requests', () => {
   let app;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
-    await init(app);
+    app = await testFastify();
   });
 
   it('GET 200', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: app.reverse('root'),
-    });
+    const res = await app.testGet(app.reverse('root'));
     expect(res.statusCode).toBe(200);
   });
 
   it('GET 404', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/wrong-path',
-    });
+    const res = await app.testGet('/wrong-path');
     expect(res.statusCode).toBe(404);
   });
 

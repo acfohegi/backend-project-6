@@ -1,11 +1,10 @@
 // @ts-check
 
 import _ from 'lodash';
-import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
-import init from '../server/plugin.js';
-import { getTestData, prepareData, authenticateRequests } from './helpers/index.js';
+import testFastify from './helpers/app.js';
+import { getTestData, prepareData } from './helpers/data.js';
 
 describe('test labels CRUD', () => {
   let app;
@@ -14,14 +13,9 @@ describe('test labels CRUD', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
-    await init(app);
+    app = await testFastify({ auth: true });
     knex = app.objection.knex;
     models = app.objection.models;
-    await authenticateRequests(app);
     testData = await getTestData();
   });
 
@@ -31,33 +25,19 @@ describe('test labels CRUD', () => {
   });
 
   it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('labels'),
-    });
-
+    const response = await app.testGet(app.reverse('labels'));
     expect(response.statusCode).toBe(200);
   });
 
   it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newLabel'),
-    });
-
+    const response = await app.testGet(app.reverse('newLabel'));
     expect(response.statusCode).toBe(200);
   });
 
   it('create with no name', async () => {
     const labelsCount = await models.label.query().count();
     const params = { name: '' };
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('labels'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('labels'), { data: params });
 
     expect(response.statusCode).toBe(200);
     const result = await models.label.query().count();
@@ -66,13 +46,7 @@ describe('test labels CRUD', () => {
 
   it('create', async () => {
     const params = { name: faker.lorem.word() };
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('labels'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('labels'), { data: params });
 
     expect(response.statusCode).toBe(302);
     const expected = params;
@@ -85,13 +59,7 @@ describe('test labels CRUD', () => {
     const label = await models.label.query().findById(2);
     const tasks = await label.getTasks();
     expect(tasks.length).toBe(1);
-    const response = await app.inject({
-      method: 'PATCH',
-      url: `/labels/${label.id}`,
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPatch(`/labels/${label.id}`, { data: params });
 
     const updatedLabel = await label.$query();
     expect(response.statusCode).toBe(302);
@@ -116,13 +84,7 @@ describe('test labels CRUD', () => {
       statusId,
       labels: [1, 2],
     };
-    await app.inject({
-      method: 'PATCH',
-      url: `/tasks/${task.id}`,
-      payload: {
-        data: params,
-      },
-    });
+    await app.testPatch(`/tasks/${task.id}`, { data: params });
     const updatedTask = await task.$query();
     const updatedLabels = await updatedTask.getLabels();
     expect(updatedLabels.length).toBe(2);
@@ -153,10 +115,7 @@ describe('test labels CRUD', () => {
     const label = await models.label.query().findById(3);
     const tasksForLabel = await models.taskLabel.query().where('labelId', 3);
     expect(tasksForLabel).toStrictEqual([]);
-    const response = await app.inject({
-      method: 'DELETE',
-      url: `/labels/${label.id}`,
-    });
+    const response = await app.testDelete(`/labels/${label.id}`);
 
     expect(response.statusCode).toBe(302);
     const noLabel = await models.label.query().findById(3);
@@ -167,10 +126,7 @@ describe('test labels CRUD', () => {
     const task = await models.task.query().findById(1);
     const labels = await task.getLabels();
     const label = labels[0];
-    const response = await app.inject({
-      method: 'DELETE',
-      url: `/labels/${label.id}`,
-    });
+    const response = await app.testDelete(`/labels/${label.id}`);
     expect(response.statusCode).toBe(302);
     const refreshedLabel = await label.$query();
     expect(refreshedLabel).toStrictEqual(label);
@@ -180,10 +136,7 @@ describe('test labels CRUD', () => {
     const task = await models.task.query().findById(1);
     const labels = await task.getLabels();
     const label = labels[0];
-    const response = await app.inject({
-      method: 'DELETE',
-      url: `/tasks/${task.id}`,
-    });
+    const response = await app.testDelete( `/tasks/${task.id}`);
     expect(response.statusCode).toBe(302);
     const refreshedLabel = await label.$query();
     expect(refreshedLabel).toStrictEqual(label);
@@ -191,13 +144,7 @@ describe('test labels CRUD', () => {
 
   it('add labels when creating a task', async () => {
     const params = testData.tasks.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('tasks'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('tasks'), { data: params });
 
     expect(response.statusCode).toBe(302);
     const tasks = await models.task.query().orderBy('id', 'desc').limit(1);
@@ -209,13 +156,7 @@ describe('test labels CRUD', () => {
 
   it('create a task with no labels', async () => {
     const params = _.omit(testData.tasks.new, 'labels');
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('tasks'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('tasks'), { data: params });
 
     expect(response.statusCode).toBe(302);
     const tasks = await models.task.query().orderBy('id', 'desc').limit(1);
@@ -240,13 +181,7 @@ describe('test labels CRUD', () => {
       executorId,
       labels: [labels[0].id],
     };
-    const response = await app.inject({
-      method: 'PATCH',
-      url: '/tasks/2',
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPatch( '/tasks/2', { data: params });
 
     expect(response.statusCode).toBe(302);
     const updatedTask = await task.$query();

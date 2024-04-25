@@ -1,10 +1,9 @@
 // @ts-check
 
-import fastify from 'fastify';
 import { faker } from '@faker-js/faker';
 
-import init from '../server/plugin.js';
-import { prepareData, authenticateRequests } from './helpers/index.js';
+import testFastify from './helpers/app.js';
+import { prepareData } from './helpers/data.js';
 
 describe('test statuses CRUD', () => {
   let app;
@@ -12,14 +11,9 @@ describe('test statuses CRUD', () => {
   let models;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
-    await init(app);
+    app = await testFastify({ auth: true });
     knex = app.objection.knex;
     models = app.objection.models;
-    await authenticateRequests(app);
   });
 
   beforeEach(async () => {
@@ -28,32 +22,18 @@ describe('test statuses CRUD', () => {
   });
 
   it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('statuses'),
-    });
-
+    const response = await app.testGet(app.reverse('statuses'));
     expect(response.statusCode).toBe(200);
   });
 
   it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newStatus'),
-    });
-
+    const response = await app.testGet(app.reverse('newStatus'));
     expect(response.statusCode).toBe(200);
   });
 
   it('create with no name', async () => {
     const params = { name: '' };
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('statuses'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('statuses'), { data: params });
 
     const statusesCount = await models.status.query().count();
     expect(response.statusCode).toBe(200);
@@ -63,13 +43,7 @@ describe('test statuses CRUD', () => {
 
   it('create', async () => {
     const params = { name: faker.lorem.word() };
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('statuses'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('statuses'), { data: params });
 
     expect(response.statusCode).toBe(302);
     const expected = params;

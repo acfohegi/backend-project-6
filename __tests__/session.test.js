@@ -1,8 +1,7 @@
 // @ts-check
 
-import fastify from 'fastify';
-import init from '../server/plugin.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import testFastify from './helpers/app.js';
+import { getTestData, prepareData } from './helpers/data.js';
 
 describe('test session', () => {
   let app;
@@ -10,11 +9,7 @@ describe('test session', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
-    await init(app);
+    app = await testFastify();
     knex = app.objection.knex;
     await knex.migrate.latest();
     await prepareData(app);
@@ -22,21 +17,10 @@ describe('test session', () => {
   });
 
   it('test sign in / sign out', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newSession'),
-    });
-
+    const response = await app.testGet(app.reverse('newSession'));
     expect(response.statusCode).toBe(200);
 
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
-      payload: {
-        data: testData.users.existing,
-      },
-    });
-
+    const responseSignIn = await app.testPost(app.reverse('session'), { data: testData.users.existing });
     expect(responseSignIn.statusCode).toBe(302);
     // после успешной аутентификации получаем куки из ответа,
     // они понадобятся для выполнения запросов на маршруты требующие
@@ -45,18 +29,14 @@ describe('test session', () => {
     const { name, value } = sessionCookie;
     const cookie = { [name]: value };
 
-    const responseSignOut = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('session'),
-      // используем полученные ранее куки
+    const responseSignOut = await app.testDelete(app.reverse('session'), null, {
       cookies: cookie,
     });
-
     expect(responseSignOut.statusCode).toBe(302);
   });
 
   afterAll(async () => {
-    // await knex.migrate.rollback();
+    await knex.migrate.rollback();
     await app.close();
   });
 });

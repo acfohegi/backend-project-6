@@ -1,11 +1,10 @@
 // @ts-check
 
 import _ from 'lodash';
-import fastify from 'fastify';
 
-import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
-import { getTestData, prepareData } from './helpers/index.js';
+import testFastify from './helpers/app.js';
+import { getTestData, prepareData } from './helpers/data.js';
 
 describe('test users CRUD for unauthenticated', () => {
   let app;
@@ -14,11 +13,7 @@ describe('test users CRUD for unauthenticated', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
-    await init(app);
+    app = await testFastify();
     knex = app.objection.knex;
     models = app.objection.models;
     testData = await getTestData();
@@ -30,33 +25,19 @@ describe('test users CRUD for unauthenticated', () => {
   });
 
   it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('users'),
-    });
-
+    const response = await app.testGet(app.reverse('users'));
     expect(response.statusCode).toBe(200);
   });
 
   it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newUser'),
-    });
-
+    const response = await app.testGet(app.reverse('newUser'));
     expect(response.statusCode).toBe(200);
   });
 
   it('create with no name', async () => {
     const fullData = testData.users.new;
     const params = { email: fullData.email, password: fullData.password };
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('users'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('users'), { data: params });
 
     expect(response.statusCode).toBe(200);
     const user = await models.user.query().findOne({ email: params.email });
@@ -65,13 +46,7 @@ describe('test users CRUD for unauthenticated', () => {
 
   it('create', async () => {
     const params = testData.users.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('users'),
-      payload: {
-        data: params,
-      },
-    });
+    const response = await app.testPost(app.reverse('users'), { data: params });
 
     expect(response.statusCode).toBe(302);
     const expected = {
