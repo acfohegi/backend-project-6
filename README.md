@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/acfohegi/backend-project-6/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/acfohegi/backend-project-6/actions)
-=======
 [![Actions Status](https://github.com/acfohegi/backend-project-6/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/acfohegi/backend-project-6/actions)
 [![workflow](https://github.com/acfohegi/task-manager/actions/workflows/workflow.yml/badge.svg)](https://github.com/acfohegi/task-manager/actions/workflows/workflow.yml)
 
@@ -20,4 +16,3 @@ task-manager is the final project of the ["Node.js Developer"](https://ru.hexlet
  - crafting view templates with use of CSS framework
 
 The new version is automatically deployed to Render (a PaaS provider) after successful building and testing stages in GH Actions. Uncaught errors in production are reported to Rollbar. In terms of features the project complies with requirements but some additional things are implemented like starting up within docker-compose.
->>>>>>> Stashed changes
