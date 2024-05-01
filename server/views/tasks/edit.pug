@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  = t('views.tasks.edit.title')
+  +pageHeader('views.tasks.edit.title')
 
 block content
   +formFor()(action=`/tasks/${task.id}` method='post')
