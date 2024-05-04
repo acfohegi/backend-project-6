@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  +pageHeader('views.users.edit.title')
+  = t('views.users.edit.title')
 
 block content
   +formFor()(action=`/users/${user.id}` method='post')

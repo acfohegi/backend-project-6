@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  +pageHeader('layouts.application.labels')
+  h1= t('layouts.application.labels')
 
 block content
   a.btn.btn-primary(href=`labels/new`)= t('buttons.createLabel')

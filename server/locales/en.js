@@ -167,7 +167,7 @@ export default {
       welcome: {
         index: {
           hello: 'Hello!',
-          description: 'Task Manager is the final project of the "Node.js Developer" program at Hexlet. The main goal of the project was to provide hands-on experience in building a web application from scratch.',
+          description: 'Description',
           more: 'Learn more',
         },
       },

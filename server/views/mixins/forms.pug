@@ -33,7 +33,7 @@ mixin formField(tag, entity, entityName, propertyName, errors = {})
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
 mixin input(entity, entityName, propertyName, errors = {})
-  +formField('input', entity, entityName, propertyName, errors)&attributes(attributes)
+  +formField('input', entity, entityName, propertyName, errors)
 
 mixin textarea(entity, entityName, propertyName, errors = {})
   +formField('textarea', entity, entityName, propertyName, errors)

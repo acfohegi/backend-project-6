@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block header
-  +pageHeader('layouts.application.statuses')
+  h1= t('layouts.application.statuses')
 
 block content
   a.btn.btn-primary(href=`statuses/new`)= t('buttons.createStatus')
