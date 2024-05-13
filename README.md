@@ -16,3 +16,4 @@ task-manager is the final project of the ["Node.js Developer"](https://ru.hexlet
  - crafting view templates with use of CSS framework
 
 The new version is automatically deployed to Render (a PaaS provider) after successful building and testing stages in GH Actions. Uncaught errors in production are reported to Rollbar. In terms of features the project complies with requirements but some additional things are implemented like starting up within docker-compose.
+
